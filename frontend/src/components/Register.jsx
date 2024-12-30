@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios';
 
 function Register() {
@@ -8,6 +8,7 @@ function Register() {
         email: "",
         password: ""
     });
+    const navigate = useNavigate();
 
     async function addUser(e) {
         e.preventDefault();
@@ -28,11 +29,17 @@ function Register() {
                 email: "",
                 password: ""
             });
+            navigate("/login");
         } catch (e) {
             if(e.response.status === 400)
                 alert("User already exists");
             else
                 alert("Registration Failed");
+            setUser({
+                name: "",
+                email: "",
+                password: ""
+            });
             console.log(e);
         }
     }

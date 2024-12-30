@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link } from "react-router-dom";
 
 function Header() {
     return (
@@ -40,7 +40,7 @@ function Header() {
             </div>
             <hr></hr>
         </>
-    )
+    );
 }
 
-export default Header
+export default Header;

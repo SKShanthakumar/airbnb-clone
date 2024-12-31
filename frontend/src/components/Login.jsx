@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useContext } from "react";
+import { UserContext } from "../userContext";
 
 function Login() {
     const [user, setUser] = useState({
         email: "",
         password: ""
     });
+    const {setUserName} = useContext(UserContext);
     const navigate = useNavigate();
 
     async function loginUser(e) {
@@ -17,11 +20,12 @@ function Login() {
         }
 
         try {
-            await axios.post("/user/login", {
+            const response = await axios.post("/user/login", {
                 email: user.email,
                 password: user.password
             });
-            alert("Login Successful")
+            setUserName(response.data.name);               // context update
+            alert("Login Successful");
             setUser({
                 name: "",
                 email: "",

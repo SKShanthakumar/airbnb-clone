@@ -53,7 +53,7 @@ const loginUser = asyncHandler(async (req, res) => {
     if (user && (await bcrypt.compare(password, user.password))) {
         const accessToken = jwt.sign({
             user: {
-                username: user.username,
+                name: user.name,
                 email: user.email,
                 id: user.id
             }
@@ -62,8 +62,9 @@ const loginUser = asyncHandler(async (req, res) => {
             { expiresIn: "30m" });
         res.status(200).cookie('accessToken', accessToken, {
             httpOnly: true,
-            sameSite: 'None'
-        }).json("login successful");
+            sameSite: 'lax',
+            secure: false,
+        }).json({name: user.name});
     } else {
         res.status(400);
         throw new Error("email or password not valid");
@@ -74,7 +75,7 @@ const loginUser = asyncHandler(async (req, res) => {
 //@route GET /api/users/current
 //@access private
 const currentUser = asyncHandler(async (req, res) => {
-    res.json(req.user);
+    res.status(200).json(req.user);
 });
 
 export { registerUser, loginUser, currentUser }

@@ -2,11 +2,9 @@ import asyncHandler from "express-async-handler";
 import jwt from "jsonwebtoken";
 
 const validateToken = asyncHandler(async (req, res, next) => {
-    let token;
-    let authHeader = req.headers.authorization || req.headers.Authorization;
+    let token = req.cookies.accessToken
 
-    if (authHeader && authHeader.startsWith("Bearer")) {
-        token = authHeader.split(" ")[1];
+    if (token) {
         jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
             if (err) {
                 res.status(401);
@@ -15,11 +13,10 @@ const validateToken = asyncHandler(async (req, res, next) => {
             req.user = decoded.user;
             next();
         });
-
-        if (!token) {
-            res.status(401);
-            throw new Error("user is not authorized");
-        }
+    } else {
+        res.status(401);
+        req.user = {error: "login failed"}
+        throw new Error("user is not authorized");
     }
 });
 

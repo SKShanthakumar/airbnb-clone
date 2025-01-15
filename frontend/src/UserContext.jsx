@@ -6,14 +6,19 @@ export const UserContext = createContext();
 
 export function UserContextProvider({ children }) {
     const [userName, setUserName] = useState("");
+    const [userEmail, setUserEmail] = useState("");
+    const [ready, setReady] = useState(false);
 
     useEffect(() => {
-        async function fetchUser(){
+        async function fetchUser() {
             try {
                 const response = await axios.get("/user/current");
-                setUserName(response.data.name)
+                setUserName(response.data.name);
+                setUserEmail(response.data.email);
+                setReady(true);
             } catch (e) {
                 console.log(e);
+                setReady(true); 
             }
         };
 
@@ -21,7 +26,7 @@ export function UserContextProvider({ children }) {
     }, []);
 
     return (
-        <UserContext.Provider value={{ userName, setUserName }}>
+        <UserContext.Provider value={{ userName, setUserName, ready, userEmail, setUserEmail }}>
             {children}
         </UserContext.Provider>
     )

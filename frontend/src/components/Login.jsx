@@ -9,7 +9,7 @@ function Login() {
         email: "",
         password: ""
     });
-    const {setUserName} = useContext(UserContext);
+    const { setUserName, setUserEmail } = useContext(UserContext);
     const navigate = useNavigate();
 
     async function loginUser(e) {
@@ -25,9 +25,9 @@ function Login() {
                 password: user.password
             });
             setUserName(response.data.name);               // context update
+            setUserEmail(response.data.email);
             alert("Login Successful");
             setUser({
-                name: "",
                 email: "",
                 password: ""
             });

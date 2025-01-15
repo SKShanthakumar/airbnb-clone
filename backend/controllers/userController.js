@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 //@desc Register a user
-//@route POST /api/users/register
+//@route POST /api/user/register
 //@access public
 const registerUser = asyncHandler(async (req, res) => {
     const { name, email, password } = req.body;
@@ -41,7 +41,7 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 //@desc Login a user
-//@route POST /api/users/login
+//@route POST /api/user/login
 //@access public
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
@@ -59,12 +59,12 @@ const loginUser = asyncHandler(async (req, res) => {
             }
         },
             process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: "30m" });
+            { expiresIn: "12h" });
         res.status(200).cookie('accessToken', accessToken, {
             httpOnly: true,
-            sameSite: 'lax',
-            secure: false,
-        }).json({name: user.name});
+            sameSite: process.env.COOKIE_SAME_SITE,
+            secure: process.env.COOKIE_SECURE_STATE,
+        }).json({ name: user.name, email: user.email });
     } else {
         res.status(400);
         throw new Error("email or password not valid");
@@ -72,10 +72,21 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 //@desc Current user information
-//@route GET /api/users/current
+//@route GET /api/user/current
 //@access private
 const currentUser = asyncHandler(async (req, res) => {
     res.status(200).json(req.user);
 });
 
-export { registerUser, loginUser, currentUser }
+//@desc Logout a user
+//@route POST /api/user/logout
+//@access private
+const logoutUser = asyncHandler(async (req, res) => {
+    res.status(200).cookie('accessToken', '', {
+        httpOnly: true,
+        sameSite: process.env.COOKIE_SAME_SITE,
+        secure: process.env.COOKIE_SECURE_STATE,
+    }).json({message: "logout successful"});
+});
+
+export { registerUser, loginUser, currentUser, logoutUser }

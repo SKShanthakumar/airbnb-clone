@@ -5,9 +5,9 @@ import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
 dotenv.config();
 
-//@desc Register a user
-//@route POST /api/user/register
-//@access public
+// @desc Register a user
+// @route POST /api/user/register
+// @access public
 const registerUser = asyncHandler(async (req, res) => {
     const { name, email, password } = req.body;
 
@@ -31,7 +31,6 @@ const registerUser = asyncHandler(async (req, res) => {
         password: hashedPassword
     });
 
-    console.log(`user ${user.name} added`);
     if (user) {
         res.status(201).json({ _id: user.id, email: user.email });
     } else {
@@ -40,9 +39,9 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 });
 
-//@desc Login a user
-//@route POST /api/user/login
-//@access public
+// @desc Login a user
+// @route POST /api/user/login
+// @access public
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -71,16 +70,16 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 });
 
-//@desc Current user information
-//@route GET /api/user/current
-//@access private
+// @desc Current user information
+// @route GET /api/user/current
+// @access private
 const currentUser = asyncHandler(async (req, res) => {
     res.status(200).json(req.user);
 });
 
-//@desc Logout a user
-//@route POST /api/user/logout
-//@access private
+// @desc Logout a user
+// @route POST /api/user/logout
+// @access private
 const logoutUser = asyncHandler(async (req, res) => {
     res.status(200).cookie('accessToken', '', {
         httpOnly: true,

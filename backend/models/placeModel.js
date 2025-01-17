@@ -11,9 +11,26 @@ const placeSchema = mongoose.Schema({
         required: [true, "Please provide title"]
     },
     address: {
-        type: String,
-        required: [true, "Please provide address"],
-        unique: [true, "address already exists"]
+        street: {
+            type: String,
+            required: [true, "Please provide street address"]
+        },
+        locality: {
+            type: String,
+            required: [true, "Please provide locality"]
+        },
+        city: {
+            type: String,
+            required: [true, "Please provide city"]
+        },
+        pincode: {
+            type: String,
+            required: [true, "Please provide pincode"]
+        },
+        country: {
+            type: String,
+            required: [true, "Please provide country"]
+        },
     },
     photos: {
         type: [String],

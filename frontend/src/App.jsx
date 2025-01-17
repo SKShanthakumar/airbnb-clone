@@ -1,11 +1,14 @@
 import { Route, Routes } from 'react-router-dom';
 import Login from './components/Login';
 import Register from './components/Register';
-import Account from './components/Account';
+import Profile from './components/Profile';
 import axios from 'axios';
 import Layout from './Layount';
 import Index from './components/Index';
 import { UserContextProvider } from './userContext';
+import Accommodation from './components/Accomodation';
+import AddPlace from './components/AddPlace';
+import AccountNav from './components/AccouuntNav';
 
 axios.defaults.baseURL = `${import.meta.env.VITE_API_DOMAIN}:${import.meta.env.VITE_PORT}/api`;
 axios.defaults.withCredentials = true;                  // to include cookies with the request
@@ -19,11 +22,16 @@ function App() {
             <Route index element={<Index />} />
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
-            <Route path="account/:subPage?/:action?" element={<Account />} />
+            <Route path="profile/" element={<AccountNav />} >
+              <Route index element={<Profile />} />
+              <Route path="accommodations" element={<Accommodation />} />
+              <Route path="accommodations/new" element={<AddPlace />} />
+              <Route path="bookings" element={<Profile />} />
+            </Route>
           </Route>
         </Routes>
       </UserContextProvider>
-    </div>
+    </div >
   );
 }
 

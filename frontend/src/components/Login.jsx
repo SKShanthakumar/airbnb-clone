@@ -58,7 +58,7 @@ function Login() {
                         value={user.password}
                         onChange={(e) => setUser({ ...user, password: e.target.value })}
                     />
-                    <button className="border bg-primary text-white rounded-2xl p-1 mt-5 mb-1">Login</button>
+                    <button className="border bg-primary text-white rounded-2xl p-1 mt-5 mb-1 hover:shadow-md">Login</button>
                     <div className="text-center text-gray-500">
                         Don't have an account? <Link to="/register" className="text-black underline">Register</Link>
                     </div>

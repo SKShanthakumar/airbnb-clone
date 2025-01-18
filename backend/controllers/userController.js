@@ -85,7 +85,42 @@ const logoutUser = asyncHandler(async (req, res) => {
         httpOnly: true,
         sameSite: process.env.COOKIE_SAME_SITE,
         secure: process.env.COOKIE_SECURE_STATE,
-    }).json({message: "logout successful"});
+    }).json({ message: "logout successful" });
 });
 
-export { registerUser, loginUser, currentUser, logoutUser }
+// @desc Get user data by id
+// @route GET /api/user/:id
+// @access public
+const getUserById = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+        res.status(400);
+        throw new Error("User not found");
+    }
+
+    let old = ""; // Initialize the old variable
+
+    const createdDate = new Date(user.createdAt);
+    const currentDate = new Date();
+
+    const totalMonths = (currentDate.getFullYear() - createdDate.getFullYear()) * 12 + (currentDate.getMonth() - createdDate.getMonth());
+    
+    const years = Math.floor(totalMonths / 12);
+    const months = totalMonths % 12;
+    
+    const days = Math.floor((currentDate - createdDate) / (1000 * 60 * 60 * 24));
+
+    if (years >= 1) {
+        old = `${years} year${years > 1 ? 's' : ''}`;
+    } else if (months >= 1) {
+        old = `${months} month${months > 1 ? 's' : ''}`;
+    } else {
+        old = `${days} day${days > 1 ? 's' : ''}`;
+    }
+
+    console.log(user)
+
+    res.json({ name: user.name, old }).status(200);
+});
+
+export { registerUser, loginUser, currentUser, logoutUser, getUserById }

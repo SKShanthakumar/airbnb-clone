@@ -35,7 +35,7 @@ export default function Accommodation() {
             <div>
                 {userPlaces.length > 0 &&
                     userPlaces.map(place => (
-                        <div key={place._id} className="flex border rounded-2xl my-5 overflow-hidden gap-5 cursor-pointer bg-gray-100">
+                        <Link to={`/place/${place._id}`} key={place._id} className="flex border rounded-2xl my-5 overflow-hidden gap-5 bg-gray-100">
                             <div className="h-32 w-32 border-e flex-shrink-0">
                                 <img
                                     className="aspect-square object-cover"
@@ -72,7 +72,7 @@ export default function Accommodation() {
                                     <p>{place.address.city}, {place.address.country}</p>
                                 </div>
                             </div>
-                        </div>
+                        </Link>
                     ))}
 
             </div>

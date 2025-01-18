@@ -56,6 +56,11 @@ export default function AddPlace() {
             return;
         }
 
+        if (photos.length < 5){
+            alert("Upload minimum 5 photos");
+            return;
+        }
+
         const data = {
             title,
             address,

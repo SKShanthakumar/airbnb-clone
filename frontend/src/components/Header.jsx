@@ -12,7 +12,7 @@ function Header() {
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-8 -rotate-90">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
                         </svg>
-                        <span className="font-bold text-xl">airbnb</span>
+                        <span className="hidden md:block font-bold text-xl">airbnb</span>
                     </div>
                 </Link>
 
@@ -30,7 +30,7 @@ function Header() {
                 </div>
                 <Link to={userName?"/profile":"/login"}>
                     <div className="flex items-center gap-4 border border-gray-300 rounded-full py-2 ps-4 pe-2 hover:bg-gray-100">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="hidden md:block size-6">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                         </svg>
                         <div className="border border-gray-500 rounded-full bg-gray-500 text-white p-1">

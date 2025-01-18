@@ -117,9 +117,7 @@ const getUserById = asyncHandler(async (req, res) => {
     } else {
         old = `${days} day${days > 1 ? 's' : ''}`;
     }
-
-    console.log(user)
-
+    
     res.json({ name: user.name, old }).status(200);
 });
 

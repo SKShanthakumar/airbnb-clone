@@ -56,7 +56,7 @@ export default function FormPhotos({ photos, setPhotos, photoLink, setPhotoLink 
                     placeholder="enter resource link of an image to dowload" />
                 <button onClick={(e) => addPhotoByLink(e)} className="bg-gray-200 rounded-2xl px-4">Add&nbsp;Photo</button>
             </div>
-            <div className="mt-2 flex gap-2 flex-wrap justify-items-stretch">
+            <div className="mt-2 flex gap-2 flex-wrap">
                 {photos.length > 0 &&
                     photos.map((item) => (
                         <div key={item} className="flex relative">

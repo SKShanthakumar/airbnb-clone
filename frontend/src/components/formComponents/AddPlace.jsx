@@ -19,6 +19,7 @@ export default function AddPlace() {
     const [checkIn, setCheckIn] = useState('');
     const [checkOut, setCheckOut] = useState('');
     const [maxGuests, setMaxGuests] = useState('');
+    const [price, setPrice] = useState('');
 
     useEffect(() => {
         if (!id) {
@@ -37,6 +38,7 @@ export default function AddPlace() {
             setCheckIn(data.checkIn);
             setCheckOut(data.checkOut);
             setMaxGuests(data.maxGuests);
+            setPrice(data.price);
         }
         fetchData();
     }, []);
@@ -44,7 +46,7 @@ export default function AddPlace() {
     async function SavePlace(e) {
         e.preventDefault();
 
-        if (!title || !address.street || !address.locality || !address.city || !address.pincode || !address.country || !photos || !description || !checkIn || !checkOut || !maxGuests) {
+        if (!title || !address.street || !address.locality || !address.city || !address.pincode || !address.country || !photos || !description || !checkIn || !checkOut || !maxGuests || !price) {
             alert("Fill all the mandatory fields");
             return;
         }
@@ -63,7 +65,8 @@ export default function AddPlace() {
             extraInfo,
             checkIn,
             checkOut,
-            maxGuests
+            maxGuests,
+            price
         }
 
         if (!id) {
@@ -78,6 +81,7 @@ export default function AddPlace() {
                 setCheckIn('');
                 setCheckOut('');
                 setMaxGuests('');
+                setPrice('');
 
                 alert("Accomodation added successfully");
             }
@@ -90,7 +94,7 @@ export default function AddPlace() {
     }
 
     return (
-        <div className="container mx-auto">
+        <div className="container mx-auto px-5">
             <form onSubmit={(e) => SavePlace(e)}>
                 <h2 className="text-2xl mt-4">Title</h2>
                 <p className="text-gray-500 text-sm my-1">Title for your place, should be short and catchy as in advertisement</p>
@@ -126,7 +130,7 @@ export default function AddPlace() {
 
                 <h2 className="text-2xl mt-4">Check in & out times <span className="text-gray-500 text-sm">(in 24hrs format)</span></h2>
                 <p className="text-gray-500 text-sm my-1">Add check in & out times, remember to have some time window for cleaning the room between guests</p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
                     <div>
                         <h3 className="my-1">Check in time</h3>
                         <input type="text"
@@ -150,6 +154,14 @@ export default function AddPlace() {
                             onChange={(e) => setMaxGuests(e.target.value)}
                             className="border rounded-2xl py-2 px-3 w-full"
                             placeholder="1" />
+                    </div>
+                    <div>
+                        <h3 className="my-1">Price per night</h3>
+                        <input type="number"
+                            value={price}
+                            onChange={(e) => setPrice(e.target.value)}
+                            className="border rounded-2xl py-2 px-3 w-full"
+                            placeholder="5000 INR" />
                     </div>
                 </div>
 

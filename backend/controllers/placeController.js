@@ -49,7 +49,7 @@ const uploadFromDevice = asyncHandler(async (req, res) => {
 // @route POST /api/place/add
 // @access private
 const addAccomodation = asyncHandler(async (req, res) => {
-    const { title, address, photos, description, perks, extraInfo, checkIn, checkOut, maxGuests } = req.body;
+    const { title, address, photos, description, perks, extraInfo, checkIn, checkOut, maxGuests, price } = req.body;
 
     const placeAvailable = await Place.findOne({ address });
     if (placeAvailable) {
@@ -67,7 +67,8 @@ const addAccomodation = asyncHandler(async (req, res) => {
         extraInfo,
         checkIn,
         checkOut,
-        maxGuests
+        maxGuests,
+        price
     });
 
     if (place) {
@@ -78,7 +79,7 @@ const addAccomodation = asyncHandler(async (req, res) => {
 });
 
 // @desc Update an accomodation
-// @route PUT /api/place/update
+// @route PUT /api/place/:id
 // @access private
 const updateAccomodation = asyncHandler(async (req, res) => {
     const data = await Place.findById(req.params.id);
@@ -97,7 +98,7 @@ const updateAccomodation = asyncHandler(async (req, res) => {
 // @desc Get all accomodations added by a user
 // @route GET /api/place/my-places
 // @access private
-const getAccomodations = asyncHandler(async (req, res) => {
+const getMyAccomodations = asyncHandler(async (req, res) => {
     const data = await Place.find({ owner: req.user.id });
     if (data)
         res.json(data).status(200);
@@ -122,4 +123,17 @@ const getAccomodationById = asyncHandler(async (req, res) => {
     res.json(data).status(200);
 });
 
-export { uploadByLink, uploadFromDevice, addAccomodation, updateAccomodation, getAccomodations, getAccomodationById }
+// @desc Get all accomodations
+// @route GET /api/place
+// @access public
+const getAccomodations = asyncHandler(async (req, res) => {
+    const data = await Place.find();
+    if (data)
+        res.json(data).status(200);
+    else {
+        res.status(400);
+        throw new Error("Database Error");
+    }
+});
+
+export { uploadByLink, uploadFromDevice, addAccomodation, updateAccomodation, getMyAccomodations, getAccomodationById, getAccomodations }

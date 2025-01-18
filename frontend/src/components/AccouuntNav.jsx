@@ -11,7 +11,7 @@ export default function AccountNav() {
         if (subPage === page)
             classes += "bg-primary text-white rounded-full shadow-md";
         else
-            classes += "bg-gray-200 rounded-full"
+            classes += "bg-gray-100 rounded-full"
         return classes
     }
 

@@ -58,6 +58,10 @@ const placeSchema = mongoose.Schema({
         type: Number,
         required: [true, "Please provide maximum number of guests"]
     },
+    price: {
+        type: Number,
+        required: [true, "Please provide price"]
+    },
 });
 
 export default mongoose.model("Place", placeSchema); 

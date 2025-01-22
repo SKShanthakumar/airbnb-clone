@@ -12,11 +12,11 @@ const bookingSchema = mongoose.Schema({
         ref: "User",
     },
     checkIn: {
-        type: Number,
+        type: Date,
         required: [true, "Please provide check in time"]
     },
     checkOut: {
-        type: Number,
+        type: Date,
         required: [true, "Please provide check out time"]
     },
     guests: {

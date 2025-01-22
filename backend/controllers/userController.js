@@ -81,7 +81,7 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 });
 
-// @desc Login a user
+// @desc Update a user
 // @route PUT /api/user/update
 // @access private
 const updateUser = asyncHandler(async (req, res) => {
@@ -182,7 +182,7 @@ const getUserById = asyncHandler(async (req, res) => {
         old = `${days} day${days > 1 ? 's' : ''}`;
     }
 
-    res.json({ name: user.name, old }).status(200);
+    res.json({ name: user.name, old, id: user.id }).status(200);
 });
 
 export { registerUser, loginUser, updateUser, currentUser, logoutUser, getUserById }

@@ -4,6 +4,7 @@ import Place from '../models/placeModel.js'
 import { fileURLToPath } from 'url';
 import { dirname, extname, join } from 'path';
 import imageDownloader from 'image-downloader';
+import Booking from "../models/bookingModel.js";
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -45,10 +46,10 @@ const uploadFromDevice = asyncHandler(async (req, res) => {
     res.json({ fileNames });
 });
 
-// @desc Add an accomodation
+// @desc Add an accommodation
 // @route POST /api/place/add
 // @access private
-const addAccomodation = asyncHandler(async (req, res) => {
+const addAccommodation = asyncHandler(async (req, res) => {
     const { title, address, photos, description, perks, extraInfo, checkIn, checkOut, maxGuests, price } = req.body;
 
     const placeAvailable = await Place.findOne({ address });
@@ -78,10 +79,10 @@ const addAccomodation = asyncHandler(async (req, res) => {
     }
 });
 
-// @desc Update an accomodation
+// @desc Update an accommodation
 // @route PUT /api/place/:id
 // @access private
-const updateAccomodation = asyncHandler(async (req, res) => {
+const updateAccommodation = asyncHandler(async (req, res) => {
     const data = await Place.findById(req.params.id);
     if (!data) {
         res.status(400);
@@ -91,14 +92,14 @@ const updateAccomodation = asyncHandler(async (req, res) => {
         throw new Error("User not authorized to access this place")
     }
 
-    const updated = await Place.findByIdAndUpdate(req.params.id, req.body, {new:true});
+    const updated = await Place.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.status(200).json(updated);
 });
 
-// @desc Get all accomodations added by a user
+// @desc Get all accommodations added by a user
 // @route GET /api/place/my-places
 // @access private
-const getMyAccomodations = asyncHandler(async (req, res) => {
+const getMyAccommodations = asyncHandler(async (req, res) => {
     const data = await Place.find({ owner: req.user.id });
     if (data)
         res.status(200).json(data);
@@ -108,22 +109,58 @@ const getMyAccomodations = asyncHandler(async (req, res) => {
     }
 });
 
-// @desc Get accomodation by id
+// @desc Book an accommodation
+// @route GET /api/place/book
+// @access private
+const bookAccommodation = asyncHandler(async (req, res) => {
+    const { place, owner, checkIn, checkOut, guests, nights, price } = req.body;
+
+    if (owner == req.user.id) {
+        res.status(400);
+        throw new Error("You cannot book your own accommodation");
+    }
+
+    const booking = await Booking.create({
+        place,
+        client: req.user.id,
+        checkIn,
+        checkOut,
+        guests,
+        nights,
+        price
+    });
+    res.status(200).json({id: booking.id})
+});
+
+// @desc Get all bookings of a user
+// @route GET /api/place/my-bookings
+// @access private
+const getMyBookings = asyncHandler(async (req, res) => {
+    const data = await Booking.find({ client: req.user.id }).populate("place", "address id owner title photos");
+    if (data)
+        res.status(200).json(data);
+    else {
+        res.status(400);
+        throw new Error("Database Error");
+    }
+});
+
+// @desc Get accommodation by id
 // @route GET /api/place/public/:id
 // @access public
-const getAccomodationById = asyncHandler(async (req, res) => {
+const getAccommodationById = asyncHandler(async (req, res) => {
     const data = await Place.findById(req.params.id);
     if (!data) {
         res.status(400);
         throw new Error("Place not found")
-    } 
+    }
     res.status(200).json(data);
 });
 
-// @desc Get all accomodations
+// @desc Get all accommodations
 // @route GET /api/place
 // @access public
-const getAccomodations = asyncHandler(async (req, res) => {
+const getAccommodations = asyncHandler(async (req, res) => {
     const data = await Place.find();
     if (data)
         res.json(data).status(200);
@@ -133,4 +170,4 @@ const getAccomodations = asyncHandler(async (req, res) => {
     }
 });
 
-export { uploadByLink, uploadFromDevice, addAccomodation, updateAccomodation, getMyAccomodations, getAccomodationById, getAccomodations }
+export { uploadByLink, uploadFromDevice, addAccommodation, updateAccommodation, getMyAccommodations, bookAccommodation, getMyBookings, getAccommodationById, getAccommodations }

@@ -5,6 +5,8 @@ import { perkIconsMap, perkTextMap } from "./formComponents/perkMaps";
 import BookingWidget from "./BookingWidget";
 import { UserContext } from "../userContext";
 import Login from "./Login";
+import PhotosGrid from "./galleryComponents/PhotosGrid";
+import Gallery from "./galleryComponents/Gallery";
 
 export default function PlacePage() {
     const { id } = useParams();
@@ -12,7 +14,7 @@ export default function PlacePage() {
     const [owner, setOwner] = useState({ name: '', old: '' });
     const [showPhotos, setShowPhotos] = useState(false);
     const location = useLocation();
-    
+
     const { userName } = useContext(UserContext);
 
     useEffect(() => {
@@ -27,24 +29,7 @@ export default function PlacePage() {
 
     if (showPhotos) {
         return (
-            <div className="absolute bg-white min-w-full min-h-screen overflow-y-scroll">
-                <button className="m-5 fixed flex items-center rounded-full border p-2 hover:scale-105 hover:shadow-sm transition-transform duration-300 ease-in-out" onClick={(e) => { e.preventDefault(); setShowPhotos(false) }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                    </svg>
-                </button>
-                <div className="container mx-auto w-4/6 mt-6 flex flex-wrap gap-4">
-                    {place.photos?.length >= 0 && place.photos.map((photo, index) => (
-                        <div key={index}>
-                            <img
-                                className="rounded-2xl"
-                                src={`${import.meta.env.VITE_API_DOMAIN}:${import.meta.env.VITE_PORT}/uploads/${photo}`}
-                                alt={place.title}
-                            />
-                        </div>
-                    ))}
-                </div>
-            </div>
+            <Gallery photos={place.photos} toggle={setShowPhotos} />
         )
     }
 
@@ -60,64 +45,7 @@ export default function PlacePage() {
             </div>
 
             {/* photos */}
-            {place.photos?.length >= 5 && (
-                <div className="w-full mx-auto my-5 relative">
-                    {/* For medium and large screens */}
-                    <div className="hidden md:grid md:grid-cols-2 md:gap-2 rounded-2xl overflow-hidden">
-                        <div>
-                            <img
-                                onClick={(e) => setShowPhotos(true)}
-                                className="aspect-square object-cover cursor-pointer"
-                                src={`${import.meta.env.VITE_API_DOMAIN}:${import.meta.env.VITE_PORT}/uploads/${place.photos[0]}`}
-                                alt={place.title}
-                            />
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                            <img
-                                onClick={(e) => setShowPhotos(true)}
-                                className="aspect-square object-cover cursor-pointer"
-                                src={`${import.meta.env.VITE_API_DOMAIN}:${import.meta.env.VITE_PORT}/uploads/${place.photos[1]}`}
-                                alt={place.title}
-                            />
-                            <img
-                                onClick={(e) => setShowPhotos(true)}
-                                className="aspect-square object-cover cursor-pointer"
-                                src={`${import.meta.env.VITE_API_DOMAIN}:${import.meta.env.VITE_PORT}/uploads/${place.photos[2]}`}
-                                alt={place.title}
-                            />
-                            <img
-                                onClick={(e) => setShowPhotos(true)}
-                                className="aspect-square object-cover cursor-pointer"
-                                src={`${import.meta.env.VITE_API_DOMAIN}:${import.meta.env.VITE_PORT}/uploads/${place.photos[3]}`}
-                                alt={place.title}
-                            />
-                            <img
-                                onClick={(e) => setShowPhotos(true)}
-                                className="aspect-square object-cover cursor-pointer"
-                                src={`${import.meta.env.VITE_API_DOMAIN}:${import.meta.env.VITE_PORT}/uploads/${place.photos[4]}`}
-                                alt={place.title}
-                            />
-                        </div>
-                    </div>
-
-                    {/* For small screens */}
-                    <div className="md:hidden rounded-2xl overflow-hidden">
-                        <img
-                            onClick={(e) => setShowPhotos(true)}
-                            className="aspect-video object-cover cursor-pointer"
-                            src={`${import.meta.env.VITE_API_DOMAIN}:${import.meta.env.VITE_PORT}/uploads/${place.photos[0]}`}
-                            alt={place.title}
-                        />
-                    </div>
-
-                    <div onClick={(e) => setShowPhotos(true)} className="absolute right-0 bottom-0 flex mb-6 me-5 bg-white rounded-lg py-1 ps-2 pe-3 gap-2 cursor-pointer hover:bg-gray-100">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6" >
-                            <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-                        </svg>
-                        Show all photos
-                    </div>
-                </div>
-            )}
+            <PhotosGrid photos={place.photos} toggle={setShowPhotos} />
             {/* photos ends */}
 
             <div className="lg:flex">
@@ -152,8 +80,7 @@ export default function PlacePage() {
                 {/* text content ends */}
 
                 {/* Booking component */}
-                {userName != ""? <BookingWidget place={place}/>: <Login from="placePage" to={location.pathname}/>}
-                
+                {userName != "" ? <BookingWidget place={place} owner={owner} /> : <Login from="placePage" to={location.pathname} />}
                 {/* Booking component ends */}
 
             </div>

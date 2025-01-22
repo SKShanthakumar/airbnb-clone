@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { differenceInCalendarDays } from 'date-fns';
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 
-export default function BookingWidget({ place }) {
-    
+export default function BookingWidget({ place, owner }) {
+    const navigate = useNavigate();
+
     const [checkIn, setCheckIn] = useState('');
     const [checkOut, setCheckOut] = useState('');
     const [guests, setGuests] = useState('');
@@ -15,15 +18,40 @@ export default function BookingWidget({ place }) {
 
     async function bookThisPlace(e) {
         e.preventDefault();
-        if(numberOfNights <= 0){
+        if (numberOfNights <= 0) {
             alert("Enter valid check-in and check-out dates");
             return;
         }
-        if(guests <= 0 || guests == ''){
+        if (guests <= 0 || guests == '') {
             alert("Enter valid number of guests");
             return;
         }
-        console.log(userName)
+        if (guests > place.maxGuests) {
+            alert(`This place can accommodate only ${place.maxGuests} guests`);
+            return;
+        }
+        const data = {
+            "place": place._id,
+            "owner": owner.id,
+            checkIn,
+            checkOut,
+            guests,
+            nights: numberOfNights,
+            price: numberOfNights * place.price
+        }
+        try {
+            const res = await axios.post("/place/book", data);
+            if (res) {
+                alert("Booking successfull");
+                navigate("/profile/bookings");
+            } else {
+                alert("Error in booking");
+            }
+        } catch (e) {
+            if (e.response.status == 400) {
+                alert(e.response.data.message);
+            }
+        }
     }
 
     return (

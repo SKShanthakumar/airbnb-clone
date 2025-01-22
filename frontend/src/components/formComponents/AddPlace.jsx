@@ -26,7 +26,7 @@ export default function AddPlace() {
             return;
         }
         async function fetchData() {
-            const res = await axios.get(`/place/${id}`);
+            const res = await axios.get(`/place/public/${id}`);
             const data = res.data;
 
             setTitle(data.title);

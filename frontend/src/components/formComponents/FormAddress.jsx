@@ -36,7 +36,7 @@ export default function FormAddress({ address, setAddress }) {
             <input
                 type="text"
                 value={street}
-                onChange={(e) => { setStreet(e.target.value); updateAddress(); }}
+                onChange={(e) => { setStreet(e.target.value) }}
                 className="border rounded-2xl py-2 px-3 w-full"
                 placeholder="Address line 1"
             />
@@ -45,28 +45,28 @@ export default function FormAddress({ address, setAddress }) {
                 <input
                     type="text"
                     value={locality}
-                    onChange={(e) => { setLocality(e.target.value); updateAddress(); }}
+                    onChange={(e) => { setLocality(e.target.value) }}
                     className="border rounded-2xl py-2 px-3 w-full"
                     placeholder="Locality"
                 />
                 <input
                     type="text"
                     value={city}
-                    onChange={(e) => { setCity(e.target.value); updateAddress(); }}
+                    onChange={(e) => { setCity(e.target.value) }}
                     className="border rounded-2xl py-2 px-3 w-full"
                     placeholder="City"
                 />
                 <input
                     type="text"
                     value={pincode}
-                    onChange={(e) => { setPincode(e.target.value); updateAddress(); }}
+                    onChange={(e) => { setPincode(e.target.value) }}
                     className="border rounded-2xl py-2 px-3 w-full"
                     placeholder="Pincode"
                 />
                 <input
                     type="text"
                     value={country}
-                    onChange={(e) => { setCountry(e.target.value); updateAddress(); }}
+                    onChange={(e) => { setCountry(e.target.value) }}
                     className="border rounded-2xl py-2 px-3 w-full"
                     placeholder="Country"
                 />

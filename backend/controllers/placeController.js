@@ -21,7 +21,7 @@ const uploadByLink = asyncHandler(async (req, res) => {
     try {
         await imageDownloader.image({
             url: link,
-            dest: join(__dirname, 'uploads', newName),
+            dest: join(__dirname, 'uploads/placePhotos', newName),
         })
         res.json({ fileName: newName }).status(200);
     } catch (e) {
@@ -96,6 +96,31 @@ const updateAccommodation = asyncHandler(async (req, res) => {
     res.status(200).json(updated);
 });
 
+// @desc delete an accommodation
+// @route POST /api/place/delete/:id
+// @access private
+const deleteAccommodation = asyncHandler(async (req, res) => {
+    const data = await Place.findById(req.params.id);
+    if (!data) {
+        res.status(400);
+        throw new Error("Place not found")
+    } else if (data.owner != req.user.id) {
+        res.status(400);
+        throw new Error("User not authorized to delete this place")
+    }
+
+    const deleted = await Place.findByIdAndDelete(req.params.id);
+    if (!deleted) {
+        res.status(500); // Internal Server Error in case of unexpected failure
+        throw new Error("Failed to delete the place");
+    }
+
+    res.status(200).json({
+        message: "Accommodation deleted successfully",
+        deleted,
+    });
+});
+
 // @desc Get all accommodations added by a user
 // @route GET /api/place/my-places
 // @access private
@@ -129,7 +154,32 @@ const bookAccommodation = asyncHandler(async (req, res) => {
         nights,
         price
     });
-    res.status(200).json({id: booking.id})
+    res.status(200).json({ id: booking.id })
+});
+
+// @desc cancel a booking
+// @route POST /api/place/booking/cancel/:id
+// @access private
+const cancelBooking = asyncHandler(async (req, res) => {
+    const data = await Booking.findById(req.params.id);
+    if (!data) {
+        res.status(400);
+        throw new Error("Booking not found")
+    } else if (data.client != req.user.id) {
+        res.status(400);
+        throw new Error("User not authorized to cancel this booking")
+    }
+
+    const cancelled = await Booking.findByIdAndDelete(req.params.id);
+    if (!cancelled) {
+        res.status(500); // Internal Server Error in case of unexpected failure
+        throw new Error("Failed to delete the place");
+    }
+
+    res.status(200).json({
+        message: "Booking cancelled successfully",
+        cancelled,
+    });
 });
 
 // @desc Get all bookings of a user
@@ -170,4 +220,4 @@ const getAccommodations = asyncHandler(async (req, res) => {
     }
 });
 
-export { uploadByLink, uploadFromDevice, addAccommodation, updateAccommodation, getMyAccommodations, bookAccommodation, getMyBookings, getAccommodationById, getAccommodations }
+export { uploadByLink, uploadFromDevice, addAccommodation, updateAccommodation, deleteAccommodation, getMyAccommodations, bookAccommodation, cancelBooking, getMyBookings, getAccommodationById, getAccommodations }

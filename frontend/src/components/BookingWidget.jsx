@@ -47,15 +47,21 @@ export default function BookingWidget({ place, owner }) {
             } else {
                 alert("Error in booking");
             }
+            setCheckIn('');
+            setCheckOut('');
+            setGuests('');
         } catch (e) {
             if (e.response.status == 400) {
                 alert(e.response.data.message);
             }
+            setCheckIn('');
+            setCheckOut('');
+            setGuests('');
         }
     }
 
     return (
-        <div className="shadow-xl rounded-2xl p-5 pt-4 border max-h-fit sticky top-5 mb-8 z-1">
+        <div className="shadow-xl rounded-2xl p-5 pt-4 border max-h-fit sticky top-5 mb-8 z-1 max-w-fit">
             <p className="flex items-center font-medium text-2xl mt-1 relative right-1"><i className='bx bx-rupee relative top-0.5'></i>{place.price}<span className="font-normal text-lg">&nbsp;per night</span></p>
             <div className="border rounded-2xl mt-5">
                 <div className="flex">

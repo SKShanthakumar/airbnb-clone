@@ -182,7 +182,7 @@ const getUserById = asyncHandler(async (req, res) => {
         old = `${days} day${days > 1 ? 's' : ''}`;
     }
 
-    res.json({ name: user.name, old, id: user.id }).status(200);
+    res.json({ name: user.name, email:user.email, old, id: user.id }).status(200);
 });
 
 export { registerUser, loginUser, updateUser, currentUser, logoutUser, getUserById }

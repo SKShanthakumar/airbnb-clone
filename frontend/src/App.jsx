@@ -23,6 +23,7 @@ function App() {
             <Route index element={<Index />} />
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
+            <Route path="update" element={<Register />} />
             <Route path="profile/" element={<AccountNav />} >
               <Route index element={<Profile />} />
               <Route path="accommodations" element={<Accommodation />} />

@@ -13,6 +13,16 @@ function Index() {
         fetchData();
     }, [])
 
+    async function test(e) {
+        e.preventDefault();
+        try {
+            const res = await axios.get("/place/my-places");
+            console.log(res.data);
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
     return (
         <div className="container mx-auto px-5">
             <div className="grid gap-6 my-10 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
@@ -31,6 +41,7 @@ function Index() {
                     </Link>
                 ))}
             </div>
+            <button onClick={(e)=>test(e)}>test</button>
         </div>
     );
 }

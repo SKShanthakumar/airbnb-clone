@@ -9,16 +9,22 @@ dotenv.config();
 // @route POST /api/user/register
 // @access public
 const registerUser = asyncHandler(async (req, res) => {
-    const { name, email, password } = req.body;
+    const { name, email, phone, password, profilePic, language } = req.body;
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !phone) {
         res.status(400);
         throw new Error("All fields are required");
     }
-    const userAvailable = await User.findOne({ email });
-    if (userAvailable) {
+    const userAvailableEmail = await User.findOne({ email });
+    if (userAvailableEmail) {
         res.status(400);
-        throw new Error("User already registered");
+        throw new Error("Email already registered");
+    }
+
+    const userAvailablePhone = await User.findOne({ phone });
+    if (userAvailablePhone) {
+        res.status(400);
+        throw new Error("Phone number already registered");
     }
 
     //hash password
@@ -28,7 +34,10 @@ const registerUser = asyncHandler(async (req, res) => {
     const user = await User.create({
         name,
         email,
-        password: hashedPassword
+        phone,
+        password: hashedPassword,
+        profilePic,
+        language
     });
 
     if (user) {
@@ -52,9 +61,11 @@ const loginUser = asyncHandler(async (req, res) => {
     if (user && (await bcrypt.compare(password, user.password))) {
         const accessToken = jwt.sign({
             user: {
+                id: user.id,
                 name: user.name,
                 email: user.email,
-                id: user.id
+                phone: user.phone,
+                language: user.language
             }
         },
             process.env.ACCESS_TOKEN_SECRET,
@@ -68,6 +79,59 @@ const loginUser = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error("email or password not valid");
     }
+});
+
+// @desc Login a user
+// @route PUT /api/user/update
+// @access private
+const updateUser = asyncHandler(async (req, res) => {
+    const { name, email, phone, profilePic, language } = req.body;
+
+    // email & phone check
+    const emailCheck = await User.findOne({email});
+    const phoneCheck = await User.findOne({phone});
+    if((emailCheck && emailCheck.id != req.user.id) || (phoneCheck && phoneCheck.id != req.user.id)){
+        res.status(401);
+        throw new Error("user not authorized to update data with this email and phone number");
+    }
+
+    const fetchedUser = await User.findById(req.user.id);
+    if (!fetchedUser) {
+        res.status(400);
+        throw new Error("user not found")
+    }
+
+    const data = {
+        name,
+        email,
+        phone,
+        profilePic,
+        language
+    }
+
+    const updated = await User.findByIdAndUpdate(req.user.id, data, { new: true });
+
+    const accessToken = jwt.sign({
+        user: {
+            id: updated.id,
+            name: updated.name,
+            email: updated.email,
+            phone: updated.phone,
+            language: updated.language
+        }
+    },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: "12h" });
+    res.status(200).cookie('accessToken', accessToken, {
+        httpOnly: true,
+        sameSite: process.env.COOKIE_SAME_SITE,
+        secure: process.env.COOKIE_SECURE_STATE,
+    }).json({
+        name: updated.name,
+        email: updated.email,
+        phone: updated.phone,
+        language: updated.language
+    });
 });
 
 // @desc Current user information
@@ -104,10 +168,10 @@ const getUserById = asyncHandler(async (req, res) => {
     const currentDate = new Date();
 
     const totalMonths = (currentDate.getFullYear() - createdDate.getFullYear()) * 12 + (currentDate.getMonth() - createdDate.getMonth());
-    
+
     const years = Math.floor(totalMonths / 12);
     const months = totalMonths % 12;
-    
+
     const days = Math.floor((currentDate - createdDate) / (1000 * 60 * 60 * 24));
 
     if (years >= 1) {
@@ -117,8 +181,8 @@ const getUserById = asyncHandler(async (req, res) => {
     } else {
         old = `${days} day${days > 1 ? 's' : ''}`;
     }
-    
+
     res.json({ name: user.name, old }).status(200);
 });
 
-export { registerUser, loginUser, currentUser, logoutUser, getUserById }
+export { registerUser, loginUser, updateUser, currentUser, logoutUser, getUserById }

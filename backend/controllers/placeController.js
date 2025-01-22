@@ -101,7 +101,7 @@ const updateAccomodation = asyncHandler(async (req, res) => {
 const getMyAccomodations = asyncHandler(async (req, res) => {
     const data = await Place.find({ owner: req.user.id });
     if (data)
-        res.json(data).status(200);
+        res.status(200).json(data);
     else {
         res.status(400);
         throw new Error("Database Error");
@@ -109,18 +109,15 @@ const getMyAccomodations = asyncHandler(async (req, res) => {
 });
 
 // @desc Get accomodation by id
-// @route GET /api/place/:id
-// @access private
+// @route GET /api/place/public/:id
+// @access public
 const getAccomodationById = asyncHandler(async (req, res) => {
     const data = await Place.findById(req.params.id);
     if (!data) {
         res.status(400);
         throw new Error("Place not found")
-    } else if (!data.owner == req.user.id) {
-        res.status(400);
-        throw new Error("User not authorized to access this place")
-    }
-    res.json(data).status(200);
+    } 
+    res.status(200).json(data);
 });
 
 // @desc Get all accomodations

@@ -1,17 +1,23 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { useLocation, useParams } from "react-router-dom";
 import { perkIconsMap, perkTextMap } from "./formComponents/perkMaps";
+import BookingWidget from "./BookingWidget";
+import { UserContext } from "../userContext";
+import Login from "./Login";
 
 export default function PlacePage() {
     const { id } = useParams();
     const [place, setPlace] = useState({});
     const [owner, setOwner] = useState({ name: '', old: '' });
     const [showPhotos, setShowPhotos] = useState(false);
+    const location = useLocation();
+    
+    const { userName } = useContext(UserContext);
 
     useEffect(() => {
         async function fetchData() {
-            const res = await axios.get(`/place/${id}`);
+            const res = await axios.get(`/place/public/${id}`);
             const ownerRes = await axios.get(`/user/${res.data.owner}`)
             setPlace(res.data)
             setOwner(ownerRes.data);
@@ -146,28 +152,8 @@ export default function PlacePage() {
                 {/* text content ends */}
 
                 {/* Booking component */}
-                <div className="shadow-xl rounded-2xl p-5 pt-4 border max-h-fit sticky top-5 mb-8 z-1">
-                    <p className="flex items-center font-medium text-2xl mt-1 relative right-1"><i className='bx bx-rupee relative top-0.5'></i>{place.price}<span className="font-normal text-lg">&nbsp;per night</span></p>
-                    <div className="border rounded-2xl mt-5">
-                        <div className="flex">
-                            <div className="border-e p-3 pt-2 flex-1 flex flex-col">
-                                <label>Check-in</label>
-                                <input type="date" />
-                            </div>
-                            <div className="p-3 pt-2 flex-1 flex flex-col">
-                                <label>Check-out</label>
-                                <input type="date" />
-                            </div>
-                        </div>
-                        <div className="border-t p-3 pt-2">
-                            <label>Number of guests</label>
-                            <input type="number"
-                                className="border rounded-2xl py-2 px-3 mt-2 w-full"
-                                placeholder="1 guest" />
-                        </div>
-                    </div>
-                    <button className="border bg-primary text-white rounded-2xl w-full mt-5 py-2">Book</button>
-                </div>
+                {userName != ""? <BookingWidget place={place}/>: <Login from="placePage" to={location.pathname}/>}
+                
                 {/* Booking component ends */}
 
             </div>

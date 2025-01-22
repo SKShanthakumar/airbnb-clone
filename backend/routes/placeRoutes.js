@@ -7,6 +7,8 @@ const router = express.Router();
 
 // public routes
 router.route("/").get(getAccomodations);
+router.route("/public/:id").get(getAccomodationById);
+
 
 router.use(validateToken);
 
@@ -15,6 +17,6 @@ router.route("/photo/upload-by-link").post(uploadByLink);
 router.route("/photo/upload-from-device").post(upload.array('photos', 100), uploadFromDevice);
 router.route("/add").post(addAccomodation);
 router.route("/my-places").get(getMyAccomodations);
-router.route("/:id").get(getAccomodationById).put(updateAccomodation);;
+router.route("/:id").put(updateAccomodation);
 
 export default router;

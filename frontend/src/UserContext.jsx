@@ -25,8 +25,13 @@ export function UserContextProvider({ children }) {
         fetchUser();
     }, []);
 
+    const updateUserContext = (newName, newEmail) => {
+        setUserName(newName);
+        setUserEmail(newEmail);
+    };
+
     return (
-        <UserContext.Provider value={{ userName, setUserName, ready, userEmail, setUserEmail }}>
+        <UserContext.Provider value={{ userName, setUserName, ready, userEmail, setUserEmail, updateUserContext }}>
             {children}
         </UserContext.Provider>
     )

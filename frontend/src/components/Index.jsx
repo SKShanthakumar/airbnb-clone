@@ -29,7 +29,7 @@ function Index() {
                 {places.length > 0 && places.map((place, index) => (
                     <Link to={`/place/${place._id}`} key={index} className="rounded-2xl overflow-hidden hover:scale-105 hover:translate-y-[-5px] hover:shadow-md transition-transform duration-300 ease-in-out">
                         <img
-                            className="aspect-video md:aspect-square rounded-xl object-cover"
+                            className="aspect-video sm:aspect-square rounded-xl object-cover"
                             src={`${import.meta.env.VITE_API_DOMAIN}:${import.meta.env.VITE_PORT}/uploads/${place.photos[0]}`}
                             alt={place.title}
                         />

@@ -30,7 +30,7 @@ export default function UserBooking() {
     }
 
     return (
-        <div className="container mx-auto p-5 grid grid-cols-2 gap-3">
+        <div className="container mx-auto p-5 grid grid-cols-1 lg:grid-cols-2 gap-3">
             {userBookings.length > 0 && userBookings.map((booking, index) => (
                 <Link key={index}
                     state={{ place: booking.place, booking }}
@@ -45,7 +45,7 @@ export default function UserBooking() {
                     </div>
                     <div className="flex grow flex-col justify-between my-2 me-5">
                         <div className="flex justify-between">
-                            <h3 className="text-xl truncate">{booking.place.title}</h3>
+                            <h3 className="text-xl truncate max-w-52 sm:max-w-80     md:max-w-96 lg:max-w-48 xl:max-w-80 2xl:max-w-full">{booking.place.title}</h3>
                             <button onClick={(e) => cancelBooking(e, booking)} className="py-2 md:py-0 flex gap-1 items-center border border-red-500 text-red-500 hover:bg-red-500 hover:text-white rounded-2xl px-3">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />

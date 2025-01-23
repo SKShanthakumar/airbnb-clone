@@ -5,6 +5,29 @@ import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
 dotenv.config();
 
+function oldCalculator(user) {
+    let old = "";
+
+    const createdDate = new Date(user.createdAt);
+    const currentDate = new Date();
+
+    const totalMonths = (currentDate.getFullYear() - createdDate.getFullYear()) * 12 + (currentDate.getMonth() - createdDate.getMonth());
+
+    const years = Math.floor(totalMonths / 12);
+    const months = totalMonths % 12;
+
+    const days = Math.floor((currentDate - createdDate) / (1000 * 60 * 60 * 24));
+
+    if (years >= 1) {
+        old = `${years} year${years > 1 ? 's' : ''}`;
+    } else if (months >= 1) {
+        old = `${months} month${months > 1 ? 's' : ''}`;
+    } else {
+        old = `${days} day${days > 1 ? 's' : ''}`;
+    }
+    return old;
+}
+
 // @desc Register a user
 // @route POST /api/user/register
 // @access public
@@ -65,16 +88,22 @@ const loginUser = asyncHandler(async (req, res) => {
                 name: user.name,
                 email: user.email,
                 phone: user.phone,
-                language: user.language
+                language: user.language,
+                profilePic: user.profilePic,
+                favourites: user.favourites,
+                createdAt: user.createdAt
             }
         },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: "12h" });
+
+        const old = oldCalculator(user);
+
         res.status(200).cookie('accessToken', accessToken, {
             httpOnly: true,
             sameSite: process.env.COOKIE_SAME_SITE,
             secure: process.env.COOKIE_SECURE_STATE,
-        }).json({ name: user.name, email: user.email });
+        }).json({ name: user.name, email: user.email, profilePic: user.profilePic, old });
     } else {
         res.status(400);
         throw new Error("email or password not valid");
@@ -88,9 +117,9 @@ const updateUser = asyncHandler(async (req, res) => {
     const { name, email, phone, profilePic, language } = req.body;
 
     // email & phone check
-    const emailCheck = await User.findOne({email});
-    const phoneCheck = await User.findOne({phone});
-    if((emailCheck && emailCheck.id != req.user.id) || (phoneCheck && phoneCheck.id != req.user.id)){
+    const emailCheck = await User.findOne({ email });
+    const phoneCheck = await User.findOne({ phone });
+    if ((emailCheck && emailCheck.id != req.user.id) || (phoneCheck && phoneCheck.id != req.user.id)) {
         res.status(401);
         throw new Error("user not authorized to update data with this email and phone number");
     }
@@ -117,7 +146,9 @@ const updateUser = asyncHandler(async (req, res) => {
             name: updated.name,
             email: updated.email,
             phone: updated.phone,
-            language: updated.language
+            language: updated.language,
+            profilePic: updated.profilePic,
+            favourites: updated.favourites
         }
     },
         process.env.ACCESS_TOKEN_SECRET,
@@ -138,7 +169,8 @@ const updateUser = asyncHandler(async (req, res) => {
 // @route GET /api/user/current
 // @access private
 const currentUser = asyncHandler(async (req, res) => {
-    res.status(200).json(req.user);
+    const old = oldCalculator(req.user);
+    res.status(200).json({ ...req.user, old });
 });
 
 // @desc Logout a user
@@ -152,6 +184,80 @@ const logoutUser = asyncHandler(async (req, res) => {
     }).json({ message: "logout successful" });
 });
 
+// @desc set profile picture for a user
+// @route POST /api/user/set-profile-pic
+// @access private
+const setProfilePic = asyncHandler(async (req, res) => {
+    if (!req.file) {
+        res.status(400);
+        throw new Error('No file uploaded');
+    }
+
+    const img = req.file.filename;
+    console.log(img)
+
+    const updated = await User.findByIdAndUpdate(req.user.id, { profilePic: img }, { new: true });
+
+    if (!updated) {
+        res.status(400);
+        throw new Error("user not found")
+    }
+
+    const accessToken = jwt.sign({
+        user: {
+            id: updated.id,
+            name: updated.name,
+            email: updated.email,
+            phone: updated.phone,
+            language: updated.language,
+            profilePic: updated.profilePic,
+            favourites: updated.favourites
+        }
+    },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: "12h" });
+    res.status(200).cookie('accessToken', accessToken, {
+        httpOnly: true,
+        sameSite: process.env.COOKIE_SAME_SITE,
+        secure: process.env.COOKIE_SECURE_STATE,
+    }).json({
+        img
+    });
+});
+
+// @desc remove profile picture for a user
+// @route POST /api/user/remove-profile-pic
+// @access private
+const removeProfilePic = asyncHandler(async (req, res) => {
+    const updated = await User.findByIdAndUpdate(req.user.id, { profilePic: "" }, { new: true });
+
+    if (!updated) {
+        res.status(400);
+        throw new Error("user not found")
+    }
+
+    const accessToken = jwt.sign({
+        user: {
+            id: updated.id,
+            name: updated.name,
+            email: updated.email,
+            phone: updated.phone,
+            language: updated.language,
+            profilePic: updated.profilePic,
+            favourites: updated.favourites
+        }
+    },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: "12h" });
+    res.status(200).cookie('accessToken', accessToken, {
+        httpOnly: true,
+        sameSite: process.env.COOKIE_SAME_SITE,
+        secure: process.env.COOKIE_SECURE_STATE,
+    }).json({
+        img: ""
+    });
+});
+
 // @desc Get user data by id
 // @route GET /api/user/:id
 // @access public
@@ -162,27 +268,9 @@ const getUserById = asyncHandler(async (req, res) => {
         throw new Error("User not found");
     }
 
-    let old = ""; // Initialize the old variable
+    let old = oldCalculator(user)
 
-    const createdDate = new Date(user.createdAt);
-    const currentDate = new Date();
-
-    const totalMonths = (currentDate.getFullYear() - createdDate.getFullYear()) * 12 + (currentDate.getMonth() - createdDate.getMonth());
-
-    const years = Math.floor(totalMonths / 12);
-    const months = totalMonths % 12;
-
-    const days = Math.floor((currentDate - createdDate) / (1000 * 60 * 60 * 24));
-
-    if (years >= 1) {
-        old = `${years} year${years > 1 ? 's' : ''}`;
-    } else if (months >= 1) {
-        old = `${months} month${months > 1 ? 's' : ''}`;
-    } else {
-        old = `${days} day${days > 1 ? 's' : ''}`;
-    }
-
-    res.json({ name: user.name, email:user.email, old, id: user.id }).status(200);
+    res.json({ name: user.name, email: user.email, old, id: user.id, profilePic: user.profilePic }).status(200);
 });
 
-export { registerUser, loginUser, updateUser, currentUser, logoutUser, getUserById }
+export { registerUser, loginUser, updateUser, currentUser, logoutUser, getUserById, setProfilePic, removeProfilePic }

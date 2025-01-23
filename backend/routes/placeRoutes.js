@@ -1,7 +1,7 @@
 import express from 'express'
 import validateToken from '../middleware/validateTokenhandler.js'
 import { addAccommodation, bookAccommodation, cancelBooking, deleteAccommodation, getAccommodationById, getAccommodations, getMyAccommodations, getMyBookings, updateAccommodation, uploadByLink, uploadFromDevice } from '../controllers/placeController.js';
-import upload from '../middleware/multerConfig.js';
+import upload from '../middleware/multerConfigPlace.js';
 
 const router = express.Router();
 

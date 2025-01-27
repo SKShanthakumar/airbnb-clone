@@ -9,7 +9,7 @@ function Login({ from = "" , to = "/"}) {
         email: "",
         password: ""
     });
-    const { setUserName, setUserEmail, setProfile, setOld } = useContext(UserContext);
+    const { setUserName, setUserEmail, setProfile, setOld, fav, setFav } = useContext(UserContext);
     const navigate = useNavigate();
 
     async function loginUser(e) {
@@ -28,6 +28,7 @@ function Login({ from = "" , to = "/"}) {
             setUserEmail(response.data.email);
             setProfile(response.data.profilePic);
             setOld(response.data.old);
+            setFav(response.data.favourites);
             alert("Login Successful");
             setUser({
                 email: "",

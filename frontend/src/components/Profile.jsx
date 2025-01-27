@@ -1,12 +1,12 @@
 import { useContext, useState } from "react"
 import { UserContext } from "../userContext"
-import { Navigate, useNavigate } from "react-router-dom"
+import { Link, Navigate, useNavigate } from "react-router-dom"
 import axios from "axios";
 
 export default function Profile() {
     const [loggedOut, setLoggedOut] = useState(false);
 
-    const { ready, userName, userEmail, setUserName, setUserEmail, profile, setProfile, old, setOld } = useContext(UserContext);
+    const { ready, userName, userEmail, setUserName, setUserEmail, profile, setProfile, old, setOld, fav, setFav } = useContext(UserContext);
     const navigate = useNavigate();
 
     if (!ready) {
@@ -53,6 +53,7 @@ export default function Profile() {
         setUserEmail("");
         setProfile("");
         setOld("");
+        setFav([]);
         navigate("/");
     }
 
@@ -85,25 +86,34 @@ export default function Profile() {
                 </div>
             </div>
 
+            <div className="flex flex-col gap-4 grow">
+                <div className="text-center border w-full rounded-xl mx-auto p-5">
+                    <p>Logged in as {userName} ({userEmail})</p>
 
-            <div className="grow text-center border md:w-1/3 rounded-xl mx-auto p-5">
-                <p>Logged in as {userName} ({userEmail})</p>
-
-                <div className="flex flex-col gap-2 mt-5">
-                    <label className="border cursor-pointer rounded-xl bg-primary text-white px-4 py-2 hover:shadow-md">
-                        <input type="file" onChange={(e) => setProfilePic(e)} className="hidden" />
-                        {(profile != undefined && profile != '') ? "Update" : "Set"} Profile Picture
-                    </label>
-                    {(profile != undefined && profile != '') &&
+                    <div className="flex justify-center gap-2 mt-5">
                         <label className="border cursor-pointer rounded-xl bg-primary text-white px-4 py-2 hover:shadow-md">
-                            <button onClick={(e) => removeProfilePic(e)} className="hidden" />
-                            Remove Profile Picture
+                            <input type="file" onChange={(e) => setProfilePic(e)} className="hidden" />
+                            {(profile != undefined && profile != '') ? "Update" : "Set"} Profile Picture
                         </label>
-                    }
+                        {(profile != undefined && profile != '') &&
+                            <label className="border cursor-pointer rounded-xl bg-primary text-white px-4 py-2 hover:shadow-md">
+                                <button onClick={(e) => removeProfilePic(e)} className="hidden" />
+                                Remove Profile Picture
+                            </label>
+                        }
+                    </div>
                 </div>
+
+                <Link to="/profile/favourites" className="flex justify-between border w-full rounded-xl p-5">
+                    <p>Go to Favourites</p>
+                    <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+                        </svg>
+                    </div>
+                </Link  >
+
             </div>
-
-
 
         </div>
     );

@@ -12,6 +12,7 @@ import AccountNav from './components/AccouuntNav';
 import PlacePage from './components/PlacePage';
 import UserBooking from './components/UserBooking';
 import BookingPage from './components/BookingPage';
+import Favourites from './components/Favourites';
 
 axios.defaults.baseURL = `${import.meta.env.VITE_API_DOMAIN}:${import.meta.env.VITE_PORT}/api`;
 axios.defaults.withCredentials = true;                  // to include cookies with the request
@@ -33,6 +34,7 @@ function App() {
               <Route path="accommodations/:id" element={<AddPlace />} />
               <Route path="bookings" element={<UserBooking />} />
               <Route path="bookings/:id" element={<BookingPage />} />
+              <Route path="favourites" element={<Favourites />} />
             </Route>
             <Route path='place/:id' element={<PlacePage />} />
           </Route>

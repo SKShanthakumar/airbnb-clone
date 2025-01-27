@@ -8,6 +8,7 @@ export function UserContextProvider({ children }) {
     const [userName, setUserName] = useState("");
     const [userEmail, setUserEmail] = useState("");
     const [profile, setProfile] = useState('')
+    const [fav, setFav] = useState([]);
     const [old, setOld] = useState('');
     const [ready, setReady] = useState(false);
 
@@ -19,8 +20,9 @@ export function UserContextProvider({ children }) {
                 setUserEmail(response.data.email);
                 setProfile(response.data.profilePic);
                 setOld(response.data.old);
+                setFav(response.data.favourites)
                 setReady(true);
-                console.log(response.data)
+                // console.log(response.data)
             } catch (e) {
                 console.log(e);
                 setReady(true);
@@ -36,7 +38,7 @@ export function UserContextProvider({ children }) {
     };
 
     return (
-        <UserContext.Provider value={{ ready, userName, setUserName, userEmail, setUserEmail, updateUserContext, profile, setProfile, old, setOld }}>
+        <UserContext.Provider value={{ ready, userName, setUserName, userEmail, setUserEmail, updateUserContext, profile, setProfile, old, setOld, fav, setFav }}>
             {children}
         </UserContext.Provider>
     )

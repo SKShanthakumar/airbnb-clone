@@ -103,7 +103,7 @@ const loginUser = asyncHandler(async (req, res) => {
             httpOnly: true,
             sameSite: process.env.COOKIE_SAME_SITE,
             secure: process.env.COOKIE_SECURE_STATE,
-        }).json({ name: user.name, email: user.email, profilePic: user.profilePic, old });
+        }).json({ name: user.name, email: user.email, profilePic: user.profilePic, old, favourites: user.favourites });
     } else {
         res.status(400);
         throw new Error("email or password not valid");
@@ -148,7 +148,8 @@ const updateUser = asyncHandler(async (req, res) => {
             phone: updated.phone,
             language: updated.language,
             profilePic: updated.profilePic,
-            favourites: updated.favourites
+            favourites: updated.favourites,
+            createdAt: updated.createdAt
         }
     },
         process.env.ACCESS_TOKEN_SECRET,
@@ -211,7 +212,8 @@ const setProfilePic = asyncHandler(async (req, res) => {
             phone: updated.phone,
             language: updated.language,
             profilePic: updated.profilePic,
-            favourites: updated.favourites
+            favourites: updated.favourites,
+            createdAt: updated.createdAt
         }
     },
         process.env.ACCESS_TOKEN_SECRET,
@@ -244,7 +246,8 @@ const removeProfilePic = asyncHandler(async (req, res) => {
             phone: updated.phone,
             language: updated.language,
             profilePic: updated.profilePic,
-            favourites: updated.favourites
+            favourites: updated.favourites,
+            createdAt: updated.createdAt
         }
     },
         process.env.ACCESS_TOKEN_SECRET,
@@ -256,6 +259,108 @@ const removeProfilePic = asyncHandler(async (req, res) => {
     }).json({
         img: ""
     });
+});
+
+// @desc add place to favourites of user
+// @route POST /api/user/add-to-favourites
+// @access private
+const addToFavourites = asyncHandler(async (req, res) => {
+    const { id } = req.body;
+
+    if (!id) {
+        res.status(400);
+        throw new Error("Place ID is required");
+    }
+
+    const updated = await User.findByIdAndUpdate(
+        req.user.id,
+        { $addToSet: { favourites: id } }, // Add to favourites array if not already present
+        { new: true }
+    );
+
+    if (!updated) {
+        res.status(404);
+        throw new Error("User not found");
+    }
+
+    const accessToken = jwt.sign({
+        user: {
+            id: updated.id,
+            name: updated.name,
+            email: updated.email,
+            phone: updated.phone,
+            language: updated.language,
+            profilePic: updated.profilePic,
+            favourites: updated.favourites,
+            createdAt: updated.createdAt
+        }
+    },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: "12h" });
+    res.status(200).cookie('accessToken', accessToken, {
+        httpOnly: true,
+        sameSite: process.env.COOKIE_SAME_SITE,
+        secure: process.env.COOKIE_SECURE_STATE,
+    }).json({
+        favourites: updated.favourites,
+    });
+});
+
+// @desc remove place from favourites of user
+// @route POST /api/user/remove-from-favourites
+// @access private
+const removeFromFavourites = asyncHandler(async (req, res) => {
+    const { id } = req.body;
+
+    if (!id) {
+        res.status(400);
+        throw new Error("Place ID is required");
+    }
+
+    const updated = await User.findByIdAndUpdate(
+        req.user.id,
+        { $pull: { favourites: id } }, // Remove the place ID from favourites
+        { new: true }
+    );
+
+    if (!updated) {
+        res.status(404);
+        throw new Error("User not found");
+    }
+
+    const accessToken = jwt.sign({
+        user: {
+            id: updated.id,
+            name: updated.name,
+            email: updated.email,
+            phone: updated.phone,
+            language: updated.language,
+            profilePic: updated.profilePic,
+            favourites: updated.favourites,
+            createdAt: updated.createdAt
+        }
+    },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: "12h" });
+    res.status(200).cookie('accessToken', accessToken, {
+        httpOnly: true,
+        sameSite: process.env.COOKIE_SAME_SITE,
+        secure: process.env.COOKIE_SECURE_STATE,
+    }).json({
+        favourites: updated.favourites,
+    });
+});
+
+// @desc get favourites of user
+// @route GET /api/user/favourites
+// @access private
+const getFavourites = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user.id).select("favourites").populate("favourites");
+    if (!user) {
+        res.status(404);
+        throw new Error("User not found");
+    }
+    res.status(200).json(user.favourites)
 });
 
 // @desc Get user data by id
@@ -273,4 +378,4 @@ const getUserById = asyncHandler(async (req, res) => {
     res.json({ name: user.name, email: user.email, old, id: user.id, profilePic: user.profilePic }).status(200);
 });
 
-export { registerUser, loginUser, updateUser, currentUser, logoutUser, getUserById, setProfilePic, removeProfilePic }
+export { registerUser, loginUser, updateUser, currentUser, logoutUser, getUserById, setProfilePic, removeProfilePic, addToFavourites, removeFromFavourites, getFavourites }

@@ -26,9 +26,12 @@ const userSchema = mongoose.Schema({
     profilePic: {
         type: String,
     },
-    favourites: {
-        type: [String],
-    },
+    favourites: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Place", // Reference to the Place model
+        },
+    ],
 }, {
     timestamps: true
 });

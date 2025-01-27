@@ -2,7 +2,7 @@ import asyncHandler from "express-async-handler";
 import jwt from "jsonwebtoken";
 
 const validateToken = asyncHandler(async (req, res, next) => {
-    let token = req.cookies.accessToken
+    let token = req.cookies.accessToken;
 
     if (token) {
         jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {

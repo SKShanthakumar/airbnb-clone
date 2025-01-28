@@ -5,7 +5,7 @@ import { UserContext } from "../userContext";
 function Header() {
     const { userName, profile } = useContext(UserContext);
     return (
-        <>
+        <div className="fixed top-0 left-0 w-full bg-white z-50 shadow-sm">
             <div className="flex items-center justify-between p-4 container mx-auto">
                 <Link to="/" className="text-primary">
                     <div className="flex items-center gap-1">
@@ -16,10 +16,11 @@ function Header() {
                     </div>
                 </Link>
 
-                <div className="flex items-center gap-4 shadow shadow-gray-200 border border-gray-300 rounded-full py-2 ps-6 pe-2">
-                    <div>Anywhere</div>
+                {/* search bar for large screens */}
+                <div className="hidden md:flex items-center gap-4 shadow shadow-gray-200 border border-gray-300 rounded-full py-2 ps-6 pe-2 hover:shadow-md">
+                    <div className="font-semibold">Anywhere</div>
                     <div className="border-l border-gray-300 h-6"></div>
-                    <div>Any week</div>
+                    <div className="font-semibold">Any week</div>
                     <div className="border-l border-gray-300 h-6"></div>
                     <div>Add guests </div>
                     <button className="border bg-primary text-white p-2 border-gray-300 rounded-full">
@@ -28,6 +29,17 @@ function Header() {
                         </svg>
                     </button>
                 </div>
+
+                {/* search bar for small screens */}
+                <div className="flex w-full mx-10 justify-between md:hidden items-center gap-4 shadow shadow-gray-200 border border-gray-300 rounded-full py-2 ps-6 pe-2 hover:shadow-md">
+                    <div className="">Start your search</div>
+                    <button className="border bg-primary text-white p-2 border-gray-300 rounded-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                        </svg>
+                    </button>
+                </div>
+
                 <Link to={userName ? "/profile" : "/login"}>
                     <div className="flex items-center gap-4 border border-gray-300 rounded-full py-2 ps-2 md:ps-4 pe-2 hover:bg-gray-100">
                         <div className="hidden md:block">
@@ -57,7 +69,7 @@ function Header() {
                 </Link>
             </div>
             <hr></hr>
-        </>
+        </div>
     );
 }
 

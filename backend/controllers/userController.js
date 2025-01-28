@@ -2,8 +2,15 @@ import asyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import fs from 'fs';       // for deleting files from storage
 import dotenv from 'dotenv';
+import sharp from "sharp"; // for img compression
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(dirname(__filename));
 
 function oldCalculator(user) {
     let old = "";
@@ -193,15 +200,41 @@ const setProfilePic = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error('No file uploaded');
     }
-
+    const prevProfile = req.user.profilePic;
     const img = req.file.filename;
-    console.log(img)
 
-    const updated = await User.findByIdAndUpdate(req.user.id, { profilePic: img }, { new: true });
+    // Path where the original uploaded file is saved
+    const originalFilePath = join(__dirname, 'uploads', 'temp', img);
+
+    // Compress the image using sharp
+    const compressedFileName = `compressed-${img}`;
+    const compressedFilePath = join(__dirname, 'uploads', 'profile', compressedFileName);
+
+    try {
+        await sharp(originalFilePath)
+            .resize(500)  // Resize to max width of 300px
+            .toFile(compressedFilePath);  // Save the compressed version
+
+    } catch (error) {
+        res.status(500);
+        throw new Error('Error processing image');
+    }
+
+    const updated = await User.findByIdAndUpdate(req.user.id, { profilePic: compressedFileName }, { new: true });
 
     if (!updated) {
         res.status(400);
         throw new Error("user not found")
+    }
+
+    if (prevProfile != "" && prevProfile != undefined) {
+        const filePath = join(__dirname, "uploads", "profile", prevProfile); // Adjust the path to your uploads directory
+        fs.unlink(filePath, (err) => {
+            if (err && err.code !== "ENOENT") {
+                // Log error if it's not a "file not found" error
+                throw new Error(`Failed to delete file: ${filePath}, err`);
+            }
+        });
     }
 
     const accessToken = jwt.sign({
@@ -223,7 +256,7 @@ const setProfilePic = asyncHandler(async (req, res) => {
         sameSite: process.env.COOKIE_SAME_SITE,
         secure: process.env.COOKIE_SECURE_STATE,
     }).json({
-        img
+        img: compressedFileName
     });
 });
 
@@ -231,12 +264,22 @@ const setProfilePic = asyncHandler(async (req, res) => {
 // @route POST /api/user/remove-profile-pic
 // @access private
 const removeProfilePic = asyncHandler(async (req, res) => {
+    const photo = req.user.profilePic;
+
     const updated = await User.findByIdAndUpdate(req.user.id, { profilePic: "" }, { new: true });
 
     if (!updated) {
         res.status(400);
         throw new Error("user not found")
     }
+
+    const filePath = join(__dirname, "uploads", "profile", photo); // Adjust the path to your uploads directory
+    fs.unlink(filePath, (err) => {
+        if (err && err.code !== "ENOENT") {
+            // Log error if it's not a "file not found" error
+            throw new Error(`Failed to delete file: ${filePath}, err`);
+        }
+    });
 
     const accessToken = jwt.sign({
         user: {

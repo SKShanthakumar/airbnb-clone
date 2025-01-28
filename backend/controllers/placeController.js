@@ -2,9 +2,11 @@ import asyncHandler from "express-async-handler";
 import dotenv from 'dotenv';
 import Place from '../models/placeModel.js'
 import { fileURLToPath } from 'url';
-import { dirname, extname, join } from 'path';
+import { dirname, extname, join, resolve } from 'path';
 import imageDownloader from 'image-downloader';
 import Booking from "../models/bookingModel.js";
+import fs from 'fs';       // for deleting files from storage
+import sharp from "sharp"; // for img compression
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -15,18 +17,27 @@ const __dirname = dirname(dirname(__filename));
 // @access private
 const uploadByLink = asyncHandler(async (req, res) => {
     const { link } = req.body;
-    const extension = extname(link);
-    const newName = req.user.name + "-" + Date.now() + extension;
+    const extension = extname(link); // Preserve the original extension
+    const newName = `${req.user.name}-${Date.now()}${extension}`;
+    const filePath = join(__dirname, 'uploads/temp', newName);
+    const compressName = `${req.user.name}-compress-${Date.now()}${extension}`;
+    const filePathCompress = join(__dirname, 'uploads/placePhotos', compressName);
 
     try {
         await imageDownloader.image({
             url: link,
-            dest: join(__dirname, 'uploads/placePhotos', newName),
-        })
-        res.json({ fileName: newName }).status(200);
+            dest: filePath,
+        });
+
+        // Compress the image (keep the original format)
+        await sharp(filePath)
+            .resize(800) // Resize to max width of 800px
+            .toFile(filePathCompress); // Overwrite the file with the compressed version
+
+        res.status(200).json({ fileName: compressName });
     } catch (e) {
         res.status(404);
-        throw new Error("invalid link");
+        throw new Error('Invalid link or compression error' + e);
     }
 });
 
@@ -39,8 +50,27 @@ const uploadFromDevice = asyncHandler(async (req, res) => {
         throw new Error('No files uploaded');
     }
 
-    // Get the filenames of uploaded files
-    const fileNames = req.files.map(file => file.filename);
+    const fileNames = [];
+
+    for (const file of req.files) {
+        const originalFilePath = resolve('uploads/temp', file.filename);
+        const compressedFileName = req.user.name + '-compress-' + Date.now() + extname(file.originalname);
+        const compressedFilePath = resolve('uploads/placePhotos', compressedFileName);
+
+        try {
+            // Compress the image using sharp
+            await sharp(originalFilePath)
+                .resize(800) // Resize to a max width of 800px (or adjust as needed)
+                .toFile(compressedFilePath); // Save the compressed version
+
+            // Add compressed filename to response array
+            fileNames.push(compressedFileName);
+        } catch (error) {
+            console.error('Error processing image:', error);
+            res.status(500);
+            throw new Error('Error processing image');
+        }
+    }
 
     // Send the filenames as response
     res.json({ fileNames });
@@ -109,11 +139,24 @@ const deleteAccommodation = asyncHandler(async (req, res) => {
         throw new Error("User not authorized to delete this place")
     }
 
+    const photos = data.photos;
+
     const deleted = await Place.findByIdAndDelete(req.params.id);
     if (!deleted) {
         res.status(500); // Internal Server Error in case of unexpected failure
         throw new Error("Failed to delete the place");
     }
+
+    // For deleting files locally
+    photos.forEach((photo) => {
+        const filePath = join(__dirname, "uploads", "placePhotos", photo); // Adjust the path to your uploads directory
+        fs.unlink(filePath, (err) => {
+            if (err && err.code !== "ENOENT") {
+                // Log error if it's not a "file not found" error
+                throw new Error(`Failed to delete file: ${filePath}, err`);
+            }
+        });
+    });
 
     res.status(200).json({
         message: "Accommodation deleted successfully",

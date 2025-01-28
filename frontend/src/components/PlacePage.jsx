@@ -99,7 +99,7 @@ export default function PlacePage() {
 
             <div className="lg:flex justify-between">
                 {/* text content */}
-                <div className="lg:me-20">
+                <div className="grow lg:me-20">
                     <h2 className="text-xl font-semibold">Description</h2>
                     <p className="text-justify mt-3 mb-6 max-h-60 overflow-hidden">{place.description}</p>
                     <hr></hr>

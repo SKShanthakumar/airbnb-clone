@@ -4,20 +4,6 @@ import { Link } from "react-router-dom";
 import { UserContext } from "../userContext";
 
 function Index() {
-
-
-    async function test(e) {
-        e.preventDefault();
-        try {
-            const res = await axios.get("/place/my-places");
-            console.log(res.data);
-        } catch (e) {
-            console.log(e);
-        }
-    }
-
-
-
     const [places, setPlaces] = useState([]);
     const { fav, setFav } = useContext(UserContext)
 
@@ -64,10 +50,6 @@ function Index() {
                     </div>
                 ))}
             </div>
-
-
-
-            <button onClick={(e) => test(e)}>test</button>
         </div>
     );
 }

@@ -1,13 +1,17 @@
 import { Outlet } from "react-router-dom"
 import Header from "./components/Header"
+import Footer from "./components/Footer";
 
-function Layout(){
-    return(
-        <>
-        <Header/>
-        <div className="h-24"></div> {/* space on top of elements to render them below header */}
-        <Outlet/>        {/* this is where child route components would be rendered */}
-        </>
+function Layout() {
+    return (
+        <div className="flex flex-col min-h-screen">
+            <div className="grow">
+            <Header />
+            <div className="h-24"></div> {/* space on top of elements to render them below header */}
+            <Outlet />        {/* this is where child route components would be rendered */}
+            </div>
+            <Footer />
+        </div>
     );
 }
 

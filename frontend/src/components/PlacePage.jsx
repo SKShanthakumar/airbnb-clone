@@ -7,6 +7,7 @@ import { UserContext } from "../userContext";
 import Login from "./Login";
 import PhotosGrid from "./galleryComponents/PhotosGrid";
 import Gallery from "./galleryComponents/Gallery";
+import GmapEmbed from "./GmapEmbed";
 
 export default function PlacePage() {
     const { id } = useParams();
@@ -154,8 +155,13 @@ export default function PlacePage() {
                 <p className="text-xl font-semibold">Extra info</p>
                 <p className="text-justify">{place.extraInfo}</p>
             </div>
+            
+            {/* Google map embedded component */}
+            <div className="my-10">
+                <h2 className="text-xl font-semibold mb-5">Location</h2>
+                <GmapEmbed address={place.address} />
+            </div>
 
-            <div className="h-60"></div>
         </div>
     )
 }

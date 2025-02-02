@@ -8,6 +8,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { loadTrie } from './controllers/placeController.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -16,6 +17,8 @@ dotenv.config();
 connectDb();
 const app = express();
 const port = process.env.PORT || 5000;
+
+loadTrie();
 
 app.use(cors({
     origin: 'http://localhost:5173',

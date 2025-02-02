@@ -5,15 +5,20 @@ import { UserContext } from "../userContext";
 
 function Index() {
     const [places, setPlaces] = useState([]);
-    const { fav, setFav } = useContext(UserContext)
+    const { fav, setFav, searchQuery } = useContext(UserContext)
 
     useEffect(() => {
         async function fetchData() {
-            const res = await axios.get("/place");
+            let res = {};
+            if (searchQuery == "") {
+                res = await axios.get("/place");
+            } else {
+                res = await axios.get(`/place/public/search/${searchQuery}`)
+            }
             setPlaces(res.data);
         }
         fetchData();
-    }, [])
+    }, [searchQuery])
 
     async function updateFav(e, id) {
         if (!fav?.includes(id)) {

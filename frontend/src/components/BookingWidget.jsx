@@ -18,7 +18,11 @@ export default function BookingWidget({ place, owner }) {
 
     async function bookThisPlace(e) {
         e.preventDefault();
-        if (numberOfNights <= 0) {
+        const today = new Date();
+        const chkIn = new Date(checkIn);
+        const chkOut = new Date(checkOut);
+
+        if (numberOfNights <= 0 || chkIn < today || chkOut < today) {
             alert("Enter valid check-in and check-out dates");
             return;
         }

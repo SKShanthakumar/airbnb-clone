@@ -7,10 +7,28 @@ import imageDownloader from 'image-downloader';
 import Booking from "../models/bookingModel.js";
 import fs from 'fs';       // for deleting files from storage
 import sharp from "sharp"; // for img compression
+import Trie from "../dsa/trie.js";
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(dirname(__filename));
+
+// search trie
+const trie = new Trie();
+
+async function loadTrie() {
+    try {
+        const places = await Place.find();  // Fetch all places from MongoDB
+        places.forEach((place) => {
+            trie.insert(place.address.city, place.id);  // Insert each place into the Trie
+        });
+        console.log('Places loaded into Trie successfully.');
+    } catch (error) {
+        console.error('Error loading places to Trie:', error);
+    }
+};
+
+
 
 // @desc Upload photos using link
 // @route POST /api/place/photo/upload-by-link
@@ -263,4 +281,16 @@ const getAccommodations = asyncHandler(async (req, res) => {
     }
 });
 
-export { uploadByLink, uploadFromDevice, addAccommodation, updateAccommodation, deleteAccommodation, getMyAccommodations, bookAccommodation, cancelBooking, getMyBookings, getAccommodationById, getAccommodations }
+// @desc search functionality
+// @route GET /api/place/search/searchPrefix
+// @access public
+const searchByName = asyncHandler(async (req, res) => {
+    const { query } = req.params;
+    if (!query) return res.json([]);
+
+    const placeIds = trie.search(query);
+    const places = await Place.find({ _id: { $in: placeIds } });
+    res.json(places);
+})
+
+export { uploadByLink, uploadFromDevice, addAccommodation, updateAccommodation, deleteAccommodation, getMyAccommodations, bookAccommodation, cancelBooking, getMyBookings, getAccommodationById, getAccommodations, loadTrie, searchByName }

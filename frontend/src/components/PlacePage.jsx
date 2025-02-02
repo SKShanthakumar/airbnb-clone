@@ -151,7 +151,7 @@ export default function PlacePage() {
                 {/* Booking component ends */}
 
             </div>
-            <div className="bg-gray-100 px-8 py-5 mt-3">
+            <div className="bg-gray-100 px-8 py-5 mt-14 lg:mt-3">
                 <p className="text-xl font-semibold">Extra info</p>
                 <p className="text-justify">{place.extraInfo}</p>
             </div>

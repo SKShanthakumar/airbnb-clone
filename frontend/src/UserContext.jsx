@@ -11,6 +11,7 @@ export function UserContextProvider({ children }) {
     const [fav, setFav] = useState([]);
     const [old, setOld] = useState('');
     const [ready, setReady] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
 
     useEffect(() => {
         async function fetchUser() {
@@ -38,7 +39,7 @@ export function UserContextProvider({ children }) {
     };
 
     return (
-        <UserContext.Provider value={{ ready, userName, setUserName, userEmail, setUserEmail, updateUserContext, profile, setProfile, old, setOld, fav, setFav }}>
+        <UserContext.Provider value={{ ready, userName, setUserName, userEmail, setUserEmail, updateUserContext, profile, setProfile, old, setOld, fav, setFav, searchQuery, setSearchQuery }}>
             {children}
         </UserContext.Provider>
     )

@@ -63,7 +63,7 @@ export default function Profile() {
             <div className="w-96 md:max-w-80 rounded-2xl py-10 px-10 flex flex-col items-center" style={{ boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.2)' }}>
                 {(profile != undefined && profile != '') &&
                     <div className="w-52 rounded-full overflow-hidden">
-                        <img src={`${import.meta.env.VITE_API_DOMAIN}:${import.meta.env.VITE_PORT}/profile/${profile}`}
+                        <img src={`${import.meta.env.VITE_API_DOMAIN}/profile/${profile}`}
                             className="aspect-square object-cover" />
                     </div>
                 }

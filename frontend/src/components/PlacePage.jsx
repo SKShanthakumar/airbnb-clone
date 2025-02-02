@@ -108,7 +108,7 @@ export default function PlacePage() {
                         <div>
                             {(owner.profilePic != undefined && owner.profilePic != '') &&
                                 <div className="w-12 rounded-full overflow-hidden">
-                                    <img src={`${import.meta.env.VITE_API_DOMAIN}:${import.meta.env.VITE_PORT}/profile/${owner.profilePic}`}
+                                    <img src={`${import.meta.env.VITE_API_DOMAIN}/profile/${owner.profilePic}`}
                                         className="aspect-square object-cover" />
                                 </div>
                             }

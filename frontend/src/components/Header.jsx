@@ -73,7 +73,7 @@ function Header() {
                             </div>
                             {(profile != undefined && profile != '') &&
                                 <div className="w-9 rounded-full overflow-hidden">
-                                    <img src={`${import.meta.env.VITE_API_DOMAIN}:${import.meta.env.VITE_PORT}/profile/${profile}`}
+                                    <img src={`${import.meta.env.VITE_API_DOMAIN}/profile/${profile}`}
                                         className="aspect-square object-cover" />
                                 </div>
                             }

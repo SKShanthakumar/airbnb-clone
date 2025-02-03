@@ -13,7 +13,7 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(dirname(__filename));
 
-// search trie
+// search trie initialization
 const trie = new Trie();
 
 async function loadTrie() {
@@ -121,6 +121,7 @@ const addAccommodation = asyncHandler(async (req, res) => {
     });
 
     if (place) {
+        trie.insert(place.address.city, place.id);  // Insert place into the Trie
         res.status(201).json({ id: place.id, owner_id: place.owner, message: "success" });
     } else {
         res.status(200).json({ message: "Place not added" });
@@ -139,8 +140,17 @@ const updateAccommodation = asyncHandler(async (req, res) => {
         res.status(400);
         throw new Error("User not authorized to access this place")
     }
+    const oldName = data.address.city;
 
     const updated = await Place.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+    // trie updataion
+    const newName = updated.address.city;
+    if(oldName !== newName){
+        trie.delete(oldName, updated.id);
+        trie.insert(newName, updated.id);
+    }
+
     res.status(200).json(updated);
 });
 
@@ -164,6 +174,8 @@ const deleteAccommodation = asyncHandler(async (req, res) => {
         res.status(500); // Internal Server Error in case of unexpected failure
         throw new Error("Failed to delete the place");
     }
+    
+    trie.delete(data.address.city, data.id);  // Delete place from the Trie
 
     // For deleting files locally
     photos.forEach((photo) => {

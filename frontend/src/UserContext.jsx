@@ -12,6 +12,7 @@ export function UserContextProvider({ children }) {
     const [old, setOld] = useState('');
     const [ready, setReady] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [guestCount, setGuestCount] = useState('');
 
     useEffect(() => {
         async function fetchUser() {
@@ -39,7 +40,7 @@ export function UserContextProvider({ children }) {
     };
 
     return (
-        <UserContext.Provider value={{ ready, userName, setUserName, userEmail, setUserEmail, updateUserContext, profile, setProfile, old, setOld, fav, setFav, searchQuery, setSearchQuery }}>
+        <UserContext.Provider value={{ ready, userName, setUserName, userEmail, setUserEmail, updateUserContext, profile, setProfile, old, setOld, fav, setFav, searchQuery, setSearchQuery, guestCount, setGuestCount }}>
             {children}
         </UserContext.Provider>
     )

@@ -5,7 +5,7 @@ import { UserContext } from "../userContext";
 
 function Index() {
     const [places, setPlaces] = useState([]);
-    const { fav, setFav, searchQuery } = useContext(UserContext)
+    const { fav, setFav, searchQuery, guestCount } = useContext(UserContext)
 
     useEffect(() => {
         async function fetchData() {
@@ -15,10 +15,11 @@ function Index() {
             } else {
                 res = await axios.get(`/place/public/search/${searchQuery}`)
             }
-            setPlaces(res.data);
+            
+            setPlaces(res.data.filter(place => place.maxGuests >= guestCount))
         }
         fetchData();
-    }, [searchQuery])
+    }, [searchQuery, guestCount])
 
     async function updateFav(e, id) {
         if (!fav?.includes(id)) {

@@ -274,8 +274,11 @@ const cancelBooking = asyncHandler(async (req, res) => {
 // @access private
 const getMyBookings = asyncHandler(async (req, res) => {
     const data = await Booking.find({ client: req.user.id }).populate("place", "address id owner title photos");
+    const past = data.filter(booking => new Date(booking.checkIn) < new Date());
+    const upcoming = data.filter(booking => new Date(booking.checkIn) >= new Date());
+
     if (data)
-        res.status(200).json(data);
+        res.status(200).json({ past, upcoming });
     else {
         res.status(400);
         throw new Error("Database Error");

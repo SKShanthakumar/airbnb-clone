@@ -1,9 +1,9 @@
 import { useState } from "react";
-import Gallery from "./galleryComponents/Gallery";
-import PhotosGrid from "./galleryComponents/PhotosGrid";
+import Gallery from "../galleryComponents/Gallery";
+import PhotosGrid from "../galleryComponents/PhotosGrid";
 import { useLocation } from "react-router-dom";
 import { format } from "date-fns";
-import GmapEmbed from "./GmapEmbed";
+import GmapEmbed from "../GmapEmbed";
 
 export default function BookingPage() {
     const [showPhotos, setShowPhotos] = useState(false);

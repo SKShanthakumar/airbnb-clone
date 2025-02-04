@@ -8,7 +8,7 @@ export default function AccountNav() {
 
     function classNames(page) {
         let classes = "py-2 px-4 flex gap-2 ";
-        if ((subPage == "favourites" && page == "profile") || (subPage === page))
+        if ((subPage == "favourites" && page == "profile") || (subPage == "pastBookings" && page == "bookings") || (subPage === page))
             classes += "bg-primary text-white rounded-full shadow-md";
         else
             classes += "bg-gray-100 rounded-full hover:bg-gray-200"
@@ -16,7 +16,7 @@ export default function AccountNav() {
     }
 
     function responsiveClasses(page) {
-        if (subPage === page)
+        if ((subPage == "favourites" && page == "profile") || (subPage == "pastBookings" && page == "bookings") || (subPage === page))
             return "";
         return "hidden md:block ";
     }

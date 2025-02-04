@@ -4,7 +4,7 @@ import { FaGithub } from "react-icons/fa";
 
 export default function Footer() {
     return (
-        <div className="bg-gray-100 px-8 sm:px-24 py-10">
+        <div className="bg-gray-100 px-8 sm:px-24 py-10 mt-20">
             <div className="flex flex-col sm:flex-row justify-between gap-3">
                 <div className="flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">

@@ -80,7 +80,11 @@ export default function Accommodation() {
                             </div>
                         </div>
                     ))}
-
+                {userPlaces.length == 0 &&
+                    <div className="border rounded-2xl text-center p-5 w-2/3 mx-auto">
+                        You have not listed any Accommodation
+                    </div>
+                }
             </div>
         </div>
     )

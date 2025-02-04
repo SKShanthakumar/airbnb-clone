@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { UserContext } from "../userContext";
 
@@ -7,6 +7,8 @@ function Header() {
     const [isSearchFocused, setIsSearchFocused] = useState(false);
     const [typedSearch, setTypedSearch] = useState('');
     const [typedCount, setTypedCount] = useState('');
+
+    const inputRef = useRef(null);
 
     function searchBar(e) {
         e.preventDefault();
@@ -37,7 +39,7 @@ function Header() {
                     </div>
 
                     {/* search bar for large screens */}
-                    <div onClick={(e) => { setIsSearchFocused(true) }}
+                    <div onClick={(e) => { setIsSearchFocused(true); setTimeout(() => { inputRef.current.focus() }, 100); }}
                         className={`hidden md:flex relative  items-center gap-4 shadow shadow-gray-200 border border-gray-300 rounded-full py-2 ps-6 pe-2 hover:shadow-md cursor-pointer ${isSearchFocused ? "md:hidden" : "md:flex"} transition-all duration-300 ease-in-out`}>
 
                         <div className="font-semibold w-[72px] overflow-hidden">{searchQuery.trim() == "" ? "Anywhere" : searchQuery}</div>
@@ -98,11 +100,12 @@ function Header() {
                 {/* search bar expansion */}
                 <form onSubmit={(e) => searchBar(e)}
                     className={`hidden md:flex border rounded-full py-2 ps-8 pe-3 w-fit mx-auto items-center ${isSearchFocused ? "opacity-100 translate-y-0 visible" : "opacity-0 translate-y-[-50%] invisible"} transition-all duration-300 ease-in-out`} style={{ boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.2)' }}>
-                    <div className={`flex-col flex border-e me-6 ${isSearchFocused ? "lg:w-60" : "w-10"} transition-all duration-300 ease-in-out`}>
+                    <div className={`flex-col flex border-e hover:bg-gray-100 me-6 ${isSearchFocused ? "lg:w-60" : "w-10"} transition-all duration-300 ease-in-out`}>
                         Where
                         <input className="focus:outline-none placeholder-gray-500"
                             placeholder="Search destinations"
                             type="text"
+                            ref={inputRef}
                             value={typedSearch}
                             onChange={(e) => setTypedSearch(e.target.value)} />
                     </div>
@@ -119,7 +122,7 @@ function Header() {
 
                     <div className={`flex flex-col ${isSearchFocused ? "lg:w-60 w-36" : "w-10"} transition-all duration-300 ease-in-out`}>
                         Who
-                        <input className="focus:outline-none placeholder-gray-500"
+                        <input className="focus:outline-none placeholder-gray-500 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                             placeholder="Add guests"
                             type="number"
                             value={typedCount}

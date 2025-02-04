@@ -8,6 +8,7 @@ import Booking from "../models/bookingModel.js";
 import fs from 'fs';       // for deleting files from storage
 import sharp from "sharp"; // for img compression
 import Trie from "../dsa/trie.js";
+import mergeInterval from "../dsa/mergeInterval.js";
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -146,7 +147,7 @@ const updateAccommodation = asyncHandler(async (req, res) => {
 
     // trie updataion
     const newName = updated.address.city;
-    if(oldName !== newName){
+    if (oldName !== newName) {
         trie.delete(oldName, updated.id);
         trie.insert(newName, updated.id);
     }
@@ -174,7 +175,7 @@ const deleteAccommodation = asyncHandler(async (req, res) => {
         res.status(500); // Internal Server Error in case of unexpected failure
         throw new Error("Failed to delete the place");
     }
-    
+
     trie.delete(data.address.city, data.id);  // Delete place from the Trie
 
     // For deleting files locally
@@ -218,16 +219,29 @@ const bookAccommodation = asyncHandler(async (req, res) => {
         throw new Error("You cannot book your own accommodation");
     }
 
-    const booking = await Booking.create({
-        place,
-        client: req.user.id,
-        checkIn,
-        checkOut,
-        guests,
-        nights,
-        price
-    });
-    res.status(200).json({ id: booking.id })
+    const bookings = await Booking.find({ place }).sort({ checkIn: 1 });
+    let intervals = [];
+
+    for (let book of bookings) {
+        intervals.push([new Date(book.checkIn), new Date(book.checkOut)]);
+    }
+
+    const canBook = mergeInterval(intervals, [new Date(checkIn), new Date(checkOut)]);
+
+    if (canBook) {
+        const booking = await Booking.create({
+            place,
+            client: req.user.id,
+            checkIn,
+            checkOut,
+            guests,
+            nights,
+            price
+        });
+        res.status(200).json({ id: booking.id })
+    } else {
+        res.status(400).json({ message: "accommodation already booked in these dates" })
+    }
 });
 
 // @desc cancel a booking

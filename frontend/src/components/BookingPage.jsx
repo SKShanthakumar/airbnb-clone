@@ -3,6 +3,7 @@ import Gallery from "./galleryComponents/Gallery";
 import PhotosGrid from "./galleryComponents/PhotosGrid";
 import { useLocation } from "react-router-dom";
 import { format } from "date-fns";
+import GmapEmbed from "./GmapEmbed";
 
 export default function BookingPage() {
     const [showPhotos, setShowPhotos] = useState(false);
@@ -49,6 +50,12 @@ export default function BookingPage() {
             </div>
 
             <PhotosGrid photos={place.photos} toggle={setShowPhotos} />
+
+            {/* Google map embedded component */}
+            <div className="my-16">
+                <h2 className="text-xl font-semibold mb-5">Find your way</h2>
+                <GmapEmbed address={place.address} />
+            </div>
         </div>
     )
 }

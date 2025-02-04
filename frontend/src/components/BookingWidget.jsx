@@ -65,7 +65,7 @@ export default function BookingWidget({ place, owner }) {
     }
 
     return (
-        <div className="shadow-xl rounded-2xl p-5 pt-4 border max-h-fit sticky top-5 mb-8 z-1 max-w-fit">
+        <div className="shadow-xl rounded-2xl p-5 pt-4 border max-h-fit sticky top-28 mb-8 z-1 max-w-fit">
             <p className="flex items-center font-medium text-2xl mt-1 relative right-1"><i className='bx bx-rupee relative top-0.5'></i>{place.price}<span className="font-normal text-lg">&nbsp;per night</span></p>
             <div className="border rounded-2xl mt-5">
                 <div className="flex">

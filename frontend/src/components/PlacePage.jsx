@@ -138,10 +138,14 @@ export default function PlacePage() {
                         </div>
                     </div>
                     <hr></hr>
-                    <div className="my-4">
+                    <div className="mt-4 mb-10">
                         <p><span className="font-semibold">Check-in:</span> {place.checkIn}:00</p>
                         <p><span className="font-semibold">Check-out:</span> {place.checkOut}:00</p>
                         <p><span className="font-semibold">Max number of guests:</span> {place.maxGuests}</p>
+                    </div>
+                    <div className="bg-gray-100 px-8 py-5 lg:mt-3">
+                        <p className="text-xl font-semibold">Extra info</p>
+                        <p className="text-justify">{place.extraInfo}</p>
                     </div>
                 </div>
                 {/* text content ends */}
@@ -151,11 +155,8 @@ export default function PlacePage() {
                 {/* Booking component ends */}
 
             </div>
-            <div className="bg-gray-100 px-8 py-5 mt-14 lg:mt-3">
-                <p className="text-xl font-semibold">Extra info</p>
-                <p className="text-justify">{place.extraInfo}</p>
-            </div>
-            
+
+
             {/* Google map embedded component */}
             <div className="my-10">
                 <h2 className="text-xl font-semibold mb-5">Location</h2>

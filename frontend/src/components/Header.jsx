@@ -88,9 +88,13 @@ function Header() {
                                     </svg>
                                 </div>
                             }
-                            {userName && (
+                            {userName != undefined && userName != "" ? (
                                 <div className="pe-2 hidden md:block">
                                     {userName}
+                                </div>
+                            ) : (
+                                <div className="pe-2 hidden md:block font-semibold">
+                                    Login
                                 </div>
                             )}
                         </div>

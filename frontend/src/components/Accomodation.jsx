@@ -11,7 +11,7 @@ export default function Accommodation() {
                 const res = await axios.get("/place/my-places");
                 setUserPlaces(res.data);
             } catch (e) {
-                if (e.response.status == 400) {
+                if (e.response.status >= 400) {
                     alert(e.response.data.message);
                 }
             }
@@ -29,7 +29,7 @@ export default function Accommodation() {
                 setUserPlaces(userPlaces.filter(item => item != place));
                 alert("Accommodation deleted")
             } catch (e) {
-                if (e.response.status == 400) {
+                if (e.response.status >= 400) {
                     alert(e.response.data.message);
                 }
             }

@@ -26,7 +26,7 @@ export function UserContextProvider({ children }) {
                 setReady(true);
                 // console.log(response.data)
             } catch (e) {
-                if (e.response.status == 400) {
+                if (e.response.status >= 400) {
                     alert(e.response.data.message);
                 }
                 setReady(true);

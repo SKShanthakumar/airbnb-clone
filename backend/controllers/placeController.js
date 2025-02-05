@@ -200,7 +200,24 @@ const deleteAccommodation = asyncHandler(async (req, res) => {
 // @route POST /api/place/rating
 // @access private
 const rateAccommodation = asyncHandler(async (req, res) => {
-    return
+    const { id, newRating } = req.body;
+    const place = await Place.findById(id, 'rating');
+
+    let data = { rating: [] };
+
+    if (!place.rating || place.rating.length === 0) {
+        data.rating = [newRating, 1];
+    } else {
+        const oldRating = Number(place.rating[0]);
+        const numberOfRatings = Number(place.rating[1]);
+
+        const currentRating = ((oldRating * numberOfRatings) + Number(newRating)) / (numberOfRatings + 1)
+        data.rating = [currentRating.toFixed(2), numberOfRatings + 1];
+    }
+
+    const updated = await Place.findByIdAndUpdate(id, data, { new: true })
+
+    res.status(200).json(updated);
 });
 
 // @desc Get all accommodations added by a user

@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Gallery from "../galleryComponents/Gallery";
 import PhotosGrid from "../galleryComponents/PhotosGrid";
 import { useLocation } from "react-router-dom";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import GmapEmbed from "../GmapEmbed";
+import Rating from "./Rating";
 
 export default function BookingPage() {
     const [showPhotos, setShowPhotos] = useState(false);
+    const [askRating, setAskRating] = useState(false);
+
     const location = useLocation();
     const { place, booking } = location.state
 
@@ -15,6 +18,12 @@ export default function BookingPage() {
             <Gallery photos={place.photos} toggle={setShowPhotos} />
         )
     }
+
+    useEffect(() => {
+        if (new Date(booking.checkIn) < new Date()) {
+            setAskRating(true);
+        }
+    }, []);
 
     return (
         <div className="container mx-auto xl:w-4/6 mt-6 px-5">
@@ -27,7 +36,7 @@ export default function BookingPage() {
                 <a target="_blank" href={`https://maps.google.com/?q=${place.address?.city}`}>{place.address?.city}, {place.address?.country}</a>
             </div>
 
-            <div className="flex justify-between bg-gray-100 rounded-2xl p-5 mt-5">
+            <div className="flex justify-between bg-gray-100 rounded-2xl p-5 mt-5 mb-3">
                 <div>
                     <p className="font-medium text-lg mb-3">Your booking information:</p>
                     <div className="flex items-center gap-2 mb-1">
@@ -49,10 +58,15 @@ export default function BookingPage() {
                 </div>
             </div>
 
+            {/* rating */}
+            {askRating == true &&
+                <Rating />
+            }
+
             <PhotosGrid photos={place.photos} toggle={setShowPhotos} />
 
             {/* Google map embedded component */}
-            <div className="my-16">
+            <div className="my-12">
                 <h2 className="text-xl font-semibold mb-5">Find your way</h2>
                 <GmapEmbed address={place.address} />
             </div>

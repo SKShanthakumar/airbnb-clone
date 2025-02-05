@@ -32,7 +32,7 @@ export default function Profile() {
             });
             setProfile(res.data.img);
         } catch (e) {
-            if (e.response.status == 400) {
+            if (e.response.status >= 400) {
                 alert(e.response.data.message);
             }
         }
@@ -44,7 +44,7 @@ export default function Profile() {
             const res = await axios.post('/user/remove-profile-pic', {});
             setProfile(res.data.img);
         } catch (e) {
-            if (e.response.status == 400) {
+            if (e.response.status >= 400) {
                 alert(e.response.data.message);
             }
         }
@@ -61,7 +61,7 @@ export default function Profile() {
             setFav([]);
             navigate("/");
         } catch (e) {
-            if (e.response.status == 400) {
+            if (e.response.status >= 400) {
                 alert(e.response.data.message);
             }
         }

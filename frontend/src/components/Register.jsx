@@ -39,7 +39,7 @@ function Register() {
                 fetchData();
             }
         } catch (e) {
-            if (e.response.status == 400) {
+            if (e.response.status >= 400) {
                 alert(e.response.data.message);
             }
         }

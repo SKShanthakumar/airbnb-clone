@@ -19,7 +19,7 @@ function Index() {
 
                 setPlaces(res.data.filter(place => place.maxGuests >= guestCount))
             } catch (e) {
-                if (e.response.status == 400) {
+                if (e.response.status >= 400) {
                     alert(e.response.data.message);
                 }
             }
@@ -37,7 +37,7 @@ function Index() {
                 setFav(data.favourites);
             }
         } catch (e) {
-            if (e.response.status == 400) {
+            if (e.response.status >= 400) {
                 alert(e.response.data.message);
             }
         }

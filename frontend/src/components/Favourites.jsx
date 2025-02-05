@@ -13,7 +13,7 @@ export default function Favourites() {
                 const res = await axios.get("/user/favourites");
                 setFullFav(res.data);
             } catch (e) {
-                if (e.response.status == 400) {
+                if (e.response.status >= 400) {
                     alert(e.response.data.message);
                 }
             }
@@ -31,7 +31,7 @@ export default function Favourites() {
                 setFav(data.favourites);
             }
         } catch (e) {
-            if (e.response.status == 400) {
+            if (e.response.status >= 400) {
                 alert(e.response.data.message);
             }
         }

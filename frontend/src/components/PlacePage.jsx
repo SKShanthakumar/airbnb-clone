@@ -27,7 +27,7 @@ export default function PlacePage() {
                 setPlace(res.data)
                 setOwner(ownerRes.data);
             } catch (e) {
-                if (e.response.status == 400) {
+                if (e.response.status >= 400) {
                     alert(e.response.data.message);
                 }
             }
@@ -52,7 +52,7 @@ export default function PlacePage() {
                 navigate("/profile/accommodations");
             }
         } catch (e) {
-            if (e.response.status == 400) {
+            if (e.response.status >= 400) {
                 alert(e.response.data.message);
             }
         }
@@ -68,7 +68,7 @@ export default function PlacePage() {
                 setFav(data.favourites);
             }
         } catch (e) {
-            if (e.response.status == 400) {
+            if (e.response.status >= 400) {
                 alert(e.response.data.message);
             }
         }

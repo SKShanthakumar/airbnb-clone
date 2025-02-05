@@ -11,7 +11,7 @@ export default function FormPhotos({ photos, setPhotos, photoLink, setPhotoLink 
             setPhotoLink('');
             setPhotos([...photos, res.data.fileName])
         } catch (e) {
-            if (e.response.status == 400) {
+            if (e.response.status >= 400) {
                 alert(e.response.data.message);
             }
         }
@@ -36,7 +36,7 @@ export default function FormPhotos({ photos, setPhotos, photoLink, setPhotoLink 
 
             setPhotos([...photos, ...res.data.fileNames]);
         }catch(e){
-            if (e.response.status == 400) {
+            if (e.response.status >= 400) {
                 alert(e.response.data.message);
             }
         }

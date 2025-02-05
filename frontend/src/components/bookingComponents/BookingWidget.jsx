@@ -55,7 +55,7 @@ export default function BookingWidget({ place, owner }) {
             setCheckOut('');
             setGuests('');
         } catch (e) {
-            if (e.response.status == 400) {
+            if (e.response.status >= 400) {
                 alert(e.response.data.message);
             }
             setCheckIn('');

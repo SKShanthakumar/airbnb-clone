@@ -41,7 +41,7 @@ export default function AddPlace() {
                 setMaxGuests(data.maxGuests);
                 setPrice(data.price);
             } catch (e) {
-                if (e.response.status == 400) {
+                if (e.response.status >= 400) {
                     alert(e.response.data.message);
                 }
             }
@@ -103,7 +103,7 @@ export default function AddPlace() {
             }
             navigate("/profile/accommodations");
         } catch (e) {
-            if (e.response.status == 400) {
+            if (e.response.status >= 400) {
                 alert(e.response.data.message);
             }
         }

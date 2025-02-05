@@ -21,10 +21,16 @@ export default function PlacePage() {
 
     useEffect(() => {
         async function fetchData() {
-            const res = await axios.get(`/place/public/${id}`);
-            const ownerRes = await axios.get(`/user/${res.data.owner}`)
-            setPlace(res.data)
-            setOwner(ownerRes.data);
+            try {
+                const res = await axios.get(`/place/public/${id}`);
+                const ownerRes = await axios.get(`/user/${res.data.owner}`)
+                setPlace(res.data)
+                setOwner(ownerRes.data);
+            } catch (e) {
+                if (e.response.status == 400) {
+                    alert(e.response.data.message);
+                }
+            }
         }
         fetchData();
     }, [])
@@ -36,23 +42,35 @@ export default function PlacePage() {
     }
 
     async function removePlace(e) {
-        e.preventDefault();
+        try {
+            e.preventDefault();
 
-        const isConfirmed = confirm("Do you want to delete?");
-        if (isConfirmed) {
-            await axios.post(`/place/delete/${place._id}`);
-            alert("Accommodation deleted");
-            navigate("/profile/accommodations");
+            const isConfirmed = confirm("Do you want to delete?");
+            if (isConfirmed) {
+                await axios.post(`/place/delete/${place._id}`);
+                alert("Accommodation deleted");
+                navigate("/profile/accommodations");
+            }
+        } catch (e) {
+            if (e.response.status == 400) {
+                alert(e.response.data.message);
+            }
         }
     }
 
     async function updateFav(e, id) {
-        if (!fav?.includes(id)) {
-            const { data } = await axios.post("/user/add-to-favourites", { id });
-            setFav(data.favourites);
-        } else {
-            const { data } = await axios.post("/user/remove-from-favourites", { id });
-            setFav(data.favourites);
+        try {
+            if (!fav?.includes(id)) {
+                const { data } = await axios.post("/user/add-to-favourites", { id });
+                setFav(data.favourites);
+            } else {
+                const { data } = await axios.post("/user/remove-from-favourites", { id });
+                setFav(data.favourites);
+            }
+        } catch (e) {
+            if (e.response.status == 400) {
+                alert(e.response.data.message);
+            }
         }
     }
 

@@ -118,7 +118,8 @@ const addAccommodation = asyncHandler(async (req, res) => {
         checkIn,
         checkOut,
         maxGuests,
-        price
+        price,
+        rating: []
     });
 
     if (place) {
@@ -193,6 +194,13 @@ const deleteAccommodation = asyncHandler(async (req, res) => {
         message: "Accommodation deleted successfully",
         deleted,
     });
+});
+
+// @desc Add rating to an accommodation
+// @route POST /api/place/rating
+// @access private
+const rateAccommodation = asyncHandler(async (req, res) => {
+    return
 });
 
 // @desc Get all accommodations added by a user
@@ -322,4 +330,4 @@ const searchByName = asyncHandler(async (req, res) => {
     res.json(places);
 })
 
-export { uploadByLink, uploadFromDevice, addAccommodation, updateAccommodation, deleteAccommodation, getMyAccommodations, bookAccommodation, cancelBooking, getMyBookings, getAccommodationById, getAccommodations, loadTrie, searchByName }
+export { uploadByLink, uploadFromDevice, addAccommodation, updateAccommodation, deleteAccommodation, rateAccommodation, getMyAccommodations, bookAccommodation, cancelBooking, getMyBookings, getAccommodationById, getAccommodations, loadTrie, searchByName }

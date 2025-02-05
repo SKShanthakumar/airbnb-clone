@@ -31,8 +31,10 @@ export default function Profile() {
                 },
             });
             setProfile(res.data.img);
-        } catch (error) {
-            console.error("Error uploading file:", error);
+        } catch (e) {
+            if (e.response.status == 400) {
+                alert(e.response.data.message);
+            }
         }
     }
 
@@ -41,20 +43,28 @@ export default function Profile() {
         try {
             const res = await axios.post('/user/remove-profile-pic', {});
             setProfile(res.data.img);
-        } catch (error) {
-            console.error("Error uploading file:", error);
+        } catch (e) {
+            if (e.response.status == 400) {
+                alert(e.response.data.message);
+            }
         }
     }
 
     async function logout(e) {
-        await axios.post("/user/logout");
-        setLoggedOut(true);
-        setUserName("");
-        setUserEmail("");
-        setProfile("");
-        setOld("");
-        setFav([]);
-        navigate("/");
+        try {
+            await axios.post("/user/logout");
+            setLoggedOut(true);
+            setUserName("");
+            setUserEmail("");
+            setProfile("");
+            setOld("");
+            setFav([]);
+            navigate("/");
+        } catch (e) {
+            if (e.response.status == 400) {
+                alert(e.response.data.message);
+            }
+        }
     }
 
     return (

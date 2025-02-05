@@ -62,6 +62,9 @@ const placeSchema = mongoose.Schema({
         type: Number,
         required: [true, "Please provide price"]
     },
+    rating: {
+        type: [Number]
+    },
 });
 
 export default mongoose.model("Place", placeSchema); 

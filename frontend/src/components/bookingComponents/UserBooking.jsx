@@ -14,20 +14,28 @@ export default function UserBooking() {
                 setUserBookings(res.data.upcoming);
                 setPastBookings(res.data.past);
             } catch (e) {
-                console.log(e);
+                if (e.response.status == 400) {
+                    alert(e.response.data.message);
+                }
             }
         }
         fetchData();
     }, [])
 
     async function cancelBooking(e, booking) {
-        e.preventDefault();
+        try {
+            e.preventDefault();
 
-        const isConfirmed = confirm("Do you want to cancel booking?");
-        if (isConfirmed) {
-            await axios.post(`/place/booking/cancel/${booking._id}`)
-            setUserBookings(userBookings.filter(item => item != booking));
-            alert("Booking cancelled")
+            const isConfirmed = confirm("Do you want to cancel booking?");
+            if (isConfirmed) {
+                await axios.post(`/place/booking/cancel/${booking._id}`)
+                setUserBookings(userBookings.filter(item => item != booking));
+                alert("Booking cancelled")
+            }
+        } catch (e) {
+            if (e.response.status == 400) {
+                alert(e.response.data.message);
+            }
         }
     }
 

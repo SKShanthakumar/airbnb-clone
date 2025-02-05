@@ -26,19 +26,25 @@ export default function AddPlace() {
             return;
         }
         async function fetchData() {
-            const res = await axios.get(`/place/public/${id}`);
-            const data = res.data;
+            try {
+                const res = await axios.get(`/place/public/${id}`);
+                const data = res.data;
 
-            setTitle(data.title);
-            setAddress(data.address);
-            setPhotos(data.photos);
-            setDescription(data.description);
-            setPerks(data.perks);
-            setExtraInfo(data.extraInfo);
-            setCheckIn(data.checkIn);
-            setCheckOut(data.checkOut);
-            setMaxGuests(data.maxGuests);
-            setPrice(data.price);
+                setTitle(data.title);
+                setAddress(data.address);
+                setPhotos(data.photos);
+                setDescription(data.description);
+                setPerks(data.perks);
+                setExtraInfo(data.extraInfo);
+                setCheckIn(data.checkIn);
+                setCheckOut(data.checkOut);
+                setMaxGuests(data.maxGuests);
+                setPrice(data.price);
+            } catch (e) {
+                if (e.response.status == 400) {
+                    alert(e.response.data.message);
+                }
+            }
         }
         fetchData();
     }, []);
@@ -56,7 +62,7 @@ export default function AddPlace() {
             return;
         }
 
-        if (photos.length < 5){
+        if (photos.length < 5) {
             alert("Upload minimum 5 photos");
             return;
         }
@@ -73,29 +79,34 @@ export default function AddPlace() {
             maxGuests,
             price
         }
+        try {
+            if (!id) {
+                const res = await axios.post("/place/add", data);
+                if (res.data.message == "success") {
+                    setTitle('');
+                    setAddress({ street: '', locality: '', city: '', pincode: '', country: '' });
+                    setPhotos([]);
+                    setDescription('');
+                    setPerks([]);
+                    setExtraInfo('');
+                    setCheckIn('');
+                    setCheckOut('');
+                    setMaxGuests('');
+                    setPrice('');
 
-        if (!id) {
-            const res = await axios.post("/place/add", data);
-            if (res.data.message == "success") {
-                setTitle('');
-                setAddress({ street: '', locality: '', city: '', pincode: '', country: '' });
-                setPhotos([]);
-                setDescription('');
-                setPerks([]);
-                setExtraInfo('');
-                setCheckIn('');
-                setCheckOut('');
-                setMaxGuests('');
-                setPrice('');
-
-                alert("Accomodation added successfully");
+                    alert("Accomodation added successfully");
+                }
+                else
+                    alert(res.data.message);
+            } else {
+                const res = await axios.put(`/place/${id}`, data);
             }
-            else
-                alert(res.data.message);
-        } else {
-            const res = await axios.put(`/place/${id}`, data);
+            navigate("/profile/accommodations");
+        } catch (e) {
+            if (e.response.status == 400) {
+                alert(e.response.data.message);
+            }
         }
-        navigate("/profile/accommodations");
     }
 
     return (

@@ -1,6 +1,6 @@
 import express from 'express'
 import validateToken from '../middleware/validateTokenhandler.js'
-import { addAccommodation, bookAccommodation, cancelBooking, deleteAccommodation, getAccommodationById, getAccommodations, getMyAccommodations, getMyBookings, searchByName, updateAccommodation, uploadByLink, uploadFromDevice } from '../controllers/placeController.js';
+import { addAccommodation, bookAccommodation, cancelBooking, deleteAccommodation, getAccommodationById, getAccommodations, getMyAccommodations, getMyBookings, rateAccommodation, searchByName, updateAccommodation, uploadByLink, uploadFromDevice } from '../controllers/placeController.js';
 import upload from '../middleware/multerConfigPlace.js';
 
 const router = express.Router();
@@ -17,7 +17,9 @@ router.route("/photo/upload-by-link").post(uploadByLink);
 router.route("/photo/upload-from-device").post(upload.array('photos', 100), uploadFromDevice);
 router.route("/add").post(addAccommodation);
 router.route("/delete/:id").post(deleteAccommodation);
+router.route("/rating").get(rateAccommodation);
 router.route("/my-places").get(getMyAccommodations);
+
 router.route("/book").post(bookAccommodation);
 router.route("/my-bookings").get(getMyBookings);
 router.route("/booking/cancel/:id").post(cancelBooking);

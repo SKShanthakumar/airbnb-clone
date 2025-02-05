@@ -11,7 +11,9 @@ export default function Accommodation() {
                 const res = await axios.get("/place/my-places");
                 setUserPlaces(res.data);
             } catch (e) {
-                console.log(e);
+                if (e.response.status == 400) {
+                    alert(e.response.data.message);
+                }
             }
         }
         fetchData();
@@ -22,9 +24,15 @@ export default function Accommodation() {
 
         const isConfirmed = confirm("Do you want to delete?");
         if (isConfirmed) {
-            await axios.post(`/place/delete/${place._id}`)
-            setUserPlaces(userPlaces.filter(item => item != place));
-            alert("Accommodation deleted")
+            try {
+                await axios.post(`/place/delete/${place._id}`)
+                setUserPlaces(userPlaces.filter(item => item != place));
+                alert("Accommodation deleted")
+            } catch (e) {
+                if (e.response.status == 400) {
+                    alert(e.response.data.message);
+                }
+            }
         }
     }
 

@@ -23,19 +23,25 @@ function Register() {
     const { updateUserContext } = useContext(UserContext)
 
     useEffect(() => {
-        if (location.pathname == "/update") {
-            async function fetchData() {
-                const { data } = await axios.get("/user/current");
-                console.log(data)
-                setUser({
-                    name: data.name,
-                    email: data.email,
-                    phone: data.phone,
-                    password: "",
-                    language: data.language
-                })
+        try {
+            if (location.pathname == "/update") {
+                async function fetchData() {
+                    const { data } = await axios.get("/user/current");
+                    console.log(data)
+                    setUser({
+                        name: data.name,
+                        email: data.email,
+                        phone: data.phone,
+                        password: "",
+                        language: data.language
+                    })
+                }
+                fetchData();
             }
-            fetchData();
+        } catch (e) {
+            if (e.response.status == 400) {
+                alert(e.response.data.message);
+            }
         }
     }, [])
 

@@ -9,19 +9,31 @@ export default function Favourites() {
 
     useEffect(() => {
         async function fetchData() {
-            const res = await axios.get("/user/favourites");
-            setFullFav(res.data);
+            try {
+                const res = await axios.get("/user/favourites");
+                setFullFav(res.data);
+            } catch (e) {
+                if (e.response.status == 400) {
+                    alert(e.response.data.message);
+                }
+            }
         }
         fetchData();
     }, [fav])
 
     async function updateFav(e, id) {
-        if (!fav?.includes(id)) {
-            const { data } = await axios.post("/user/add-to-favourites", { id });
-            setFav(data.favourites);
-        } else {
-            const { data } = await axios.post("/user/remove-from-favourites", { id });
-            setFav(data.favourites);
+        try {
+            if (!fav?.includes(id)) {
+                const { data } = await axios.post("/user/add-to-favourites", { id });
+                setFav(data.favourites);
+            } else {
+                const { data } = await axios.post("/user/remove-from-favourites", { id });
+                setFav(data.favourites);
+            }
+        } catch (e) {
+            if (e.response.status == 400) {
+                alert(e.response.data.message);
+            }
         }
     }
 

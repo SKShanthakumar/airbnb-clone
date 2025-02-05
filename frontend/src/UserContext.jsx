@@ -26,7 +26,9 @@ export function UserContextProvider({ children }) {
                 setReady(true);
                 // console.log(response.data)
             } catch (e) {
-                console.log(e);
+                if (e.response.status == 400) {
+                    alert(e.response.data.message);
+                }
                 setReady(true);
             }
         };

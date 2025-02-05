@@ -3,12 +3,18 @@ import axios from "axios";
 export default function FormPhotos({ photos, setPhotos, photoLink, setPhotoLink }) {
 
     async function addPhotoByLink(e) {
-        e.preventDefault();
-        const res = await axios.post("/place/photo/upload-by-link", {
-            link: photoLink
-        })
-        setPhotoLink('');
-        setPhotos([...photos, res.data.fileName])
+        try {
+            e.preventDefault();
+            const res = await axios.post("/place/photo/upload-by-link", {
+                link: photoLink
+            })
+            setPhotoLink('');
+            setPhotos([...photos, res.data.fileName])
+        } catch (e) {
+            if (e.response.status == 400) {
+                alert(e.response.data.message);
+            }
+        }
     }
 
     async function uploadFromDevice(e) {
@@ -29,8 +35,10 @@ export default function FormPhotos({ photos, setPhotos, photoLink, setPhotoLink 
             });
 
             setPhotos([...photos, ...res.data.fileNames]);
-        } catch (error) {
-            console.error("Error uploading files:", error);
+        }catch(e){
+            if (e.response.status == 400) {
+                alert(e.response.data.message);
+            }
         }
     }
 

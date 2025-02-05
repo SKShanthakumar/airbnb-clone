@@ -9,25 +9,37 @@ function Index() {
 
     useEffect(() => {
         async function fetchData() {
-            let res = {};
-            if (searchQuery == "") {
-                res = await axios.get("/place");
-            } else {
-                res = await axios.get(`/place/public/search/${searchQuery}`)
+            try {
+                let res = {};
+                if (searchQuery == "") {
+                    res = await axios.get("/place");
+                } else {
+                    res = await axios.get(`/place/public/search/${searchQuery}`)
+                }
+
+                setPlaces(res.data.filter(place => place.maxGuests >= guestCount))
+            } catch (e) {
+                if (e.response.status == 400) {
+                    alert(e.response.data.message);
+                }
             }
-            
-            setPlaces(res.data.filter(place => place.maxGuests >= guestCount))
         }
         fetchData();
     }, [searchQuery, guestCount])
 
     async function updateFav(e, id) {
-        if (!fav?.includes(id)) {
-            const { data } = await axios.post("/user/add-to-favourites", { id });
-            setFav(data.favourites);
-        } else {
-            const { data } = await axios.post("/user/remove-from-favourites", { id });
-            setFav(data.favourites);
+        try {
+            if (!fav?.includes(id)) {
+                const { data } = await axios.post("/user/add-to-favourites", { id });
+                setFav(data.favourites);
+            } else {
+                const { data } = await axios.post("/user/remove-from-favourites", { id });
+                setFav(data.favourites);
+            }
+        } catch (e) {
+            if (e.response.status == 400) {
+                alert(e.response.data.message);
+            }
         }
     }
 

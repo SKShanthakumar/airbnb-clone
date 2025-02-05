@@ -202,14 +202,20 @@ const deleteAccommodation = asyncHandler(async (req, res) => {
 // @access private
 const rateAccommodation = asyncHandler(async (req, res) => {
     const { id, newRating } = req.body;
-    const place = await Place.findById(id, 'rating owner');
+    console.log(newRating);
+    const place = await Place.findById(id, 'rating owner ratedBy');
 
     if (place.owner == req.user.id) {
         res.status(400);
         throw new Error("You cannot rate your accommodation");
     }
 
-    let data = { rating: [] };
+    if (place.ratedBy.includes(req.user.id)) {
+        res.status(400);
+        throw new Error("You already rated this place")
+    }
+
+    let data = { rating: [], ratedBy: [...place.ratedBy, req.user.id] };
 
     if (!place.rating || place.rating.length === 0) {
         data.rating = [newRating, 1];
@@ -218,13 +224,21 @@ const rateAccommodation = asyncHandler(async (req, res) => {
         const numberOfRatings = Number(place.rating[1]);
 
         const currentRating = ((oldRating * numberOfRatings) + Number(newRating)) / (numberOfRatings + 1)
-        data.rating = [currentRating.toFixed(2), numberOfRatings + 1];
+        data.rating = [currentRating.toFixed(1), numberOfRatings + 1];
     }
 
     const updated = await Place.findByIdAndUpdate(id, data, { new: true })
 
     res.status(200).json({ rating: updated.rating });
 });
+
+// @desc Add rating to an accommodation
+// @route POST /api/place/get-rating/:id
+// @access private
+const getPlaceRatings = asyncHandler(async (req, res) => {
+    const ratingData = await Place.findById(req.params.id, 'rating ratedBy');
+    res.status(200).json(ratingData)
+})
 
 // @desc Get all accommodations added by a user
 // @route GET /api/place/my-places
@@ -304,7 +318,7 @@ const cancelBooking = asyncHandler(async (req, res) => {
 // @route GET /api/place/my-bookings
 // @access private
 const getMyBookings = asyncHandler(async (req, res) => {
-    const data = await Booking.find({ client: req.user.id }).populate("place", "address id owner title photos");
+    const data = await Booking.find({ client: req.user.id }).populate("place", "address id owner title photos ratedBy");
     const past = data.filter(booking => new Date(booking.checkIn) < new Date());
     const upcoming = data.filter(booking => new Date(booking.checkIn) >= new Date());
 
@@ -353,4 +367,4 @@ const searchByName = asyncHandler(async (req, res) => {
     res.json(places);
 })
 
-export { uploadByLink, uploadFromDevice, addAccommodation, updateAccommodation, deleteAccommodation, rateAccommodation, getMyAccommodations, bookAccommodation, cancelBooking, getMyBookings, getAccommodationById, getAccommodations, loadTrie, searchByName }
+export { uploadByLink, uploadFromDevice, addAccommodation, updateAccommodation, deleteAccommodation, rateAccommodation, getPlaceRatings, getMyAccommodations, bookAccommodation, cancelBooking, getMyBookings, getAccommodationById, getAccommodations, loadTrie, searchByName }

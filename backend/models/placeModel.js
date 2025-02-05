@@ -65,6 +65,12 @@ const placeSchema = mongoose.Schema({
     rating: {
         type: [Number]
     },
+    ratedBy: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+        },
+    ],
 });
 
 export default mongoose.model("Place", placeSchema); 

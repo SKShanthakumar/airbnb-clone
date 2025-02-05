@@ -14,7 +14,7 @@ export default function UserBooking() {
                 setUserBookings(res.data.upcoming);
                 setPastBookings(res.data.past);
             } catch (e) {
-                if (e.response.status >= 400) {
+                if (e.response.status == 400) {
                     alert(e.response.data.message);
                 }
             }
@@ -33,7 +33,7 @@ export default function UserBooking() {
                 alert("Booking cancelled")
             }
         } catch (e) {
-            if (e.response.status >= 400) {
+            if (e.response.status == 400) {
                 alert(e.response.data.message);
             }
         }

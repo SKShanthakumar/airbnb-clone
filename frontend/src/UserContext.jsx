@@ -5,6 +5,7 @@ import { createContext } from "react";
 export const UserContext = createContext();
 
 export function UserContextProvider({ children }) {
+    const [userId, setUserId] = useState("");
     const [userName, setUserName] = useState("");
     const [userEmail, setUserEmail] = useState("");
     const [profile, setProfile] = useState('')
@@ -18,16 +19,16 @@ export function UserContextProvider({ children }) {
         async function fetchUser() {
             try {
                 const response = await axios.get("/user/current");
+                setUserId(response.data.id);
                 setUserName(response.data.name);
                 setUserEmail(response.data.email);
                 setProfile(response.data.profilePic);
                 setOld(response.data.old);
                 setFav(response.data.favourites)
                 setReady(true);
-                // console.log(response.data)
             } catch (e) {
                 if (e.response.status >= 400) {
-                    alert(e.response.data.message);
+                    console.log(e.response.data.message);
                 }
                 setReady(true);
             }
@@ -42,7 +43,7 @@ export function UserContextProvider({ children }) {
     };
 
     return (
-        <UserContext.Provider value={{ ready, userName, setUserName, userEmail, setUserEmail, updateUserContext, profile, setProfile, old, setOld, fav, setFav, searchQuery, setSearchQuery, guestCount, setGuestCount }}>
+        <UserContext.Provider value={{ ready, userId, setUserId, userName, setUserName, userEmail, setUserEmail, updateUserContext, profile, setProfile, old, setOld, fav, setFav, searchQuery, setSearchQuery, guestCount, setGuestCount }}>
             {children}
         </UserContext.Provider>
     )

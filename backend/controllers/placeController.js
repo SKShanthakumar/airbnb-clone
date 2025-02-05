@@ -126,7 +126,8 @@ const addAccommodation = asyncHandler(async (req, res) => {
         trie.insert(place.address.city, place.id);  // Insert place into the Trie
         res.status(201).json({ id: place.id, owner_id: place.owner, message: "success" });
     } else {
-        res.status(200).json({ message: "Place not added" });
+        res.status(400)
+        throw new Error("Place not added");
     }
 });
 
@@ -201,7 +202,12 @@ const deleteAccommodation = asyncHandler(async (req, res) => {
 // @access private
 const rateAccommodation = asyncHandler(async (req, res) => {
     const { id, newRating } = req.body;
-    const place = await Place.findById(id, 'rating');
+    const place = await Place.findById(id, 'rating owner');
+
+    if (place.owner == req.user.id) {
+        res.status(400);
+        throw new Error("You cannot rate your accommodation");
+    }
 
     let data = { rating: [] };
 
@@ -217,7 +223,7 @@ const rateAccommodation = asyncHandler(async (req, res) => {
 
     const updated = await Place.findByIdAndUpdate(id, data, { new: true })
 
-    res.status(200).json(updated);
+    res.status(200).json({ rating: updated.rating });
 });
 
 // @desc Get all accommodations added by a user

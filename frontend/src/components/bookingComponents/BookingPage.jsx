@@ -60,7 +60,7 @@ export default function BookingPage() {
 
             {/* rating */}
             {askRating == true &&
-                <Rating />
+                <Rating place={place} toggle={setAskRating} />
             }
 
             <PhotosGrid photos={place.photos} toggle={setShowPhotos} />

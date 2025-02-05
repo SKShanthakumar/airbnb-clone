@@ -17,7 +17,7 @@ router.route("/photo/upload-by-link").post(uploadByLink);
 router.route("/photo/upload-from-device").post(upload.array('photos', 100), uploadFromDevice);
 router.route("/add").post(addAccommodation);
 router.route("/delete/:id").post(deleteAccommodation);
-router.route("/rating").get(rateAccommodation);
+router.route("/rating").post(rateAccommodation);
 router.route("/my-places").get(getMyAccommodations);
 
 router.route("/book").post(bookAccommodation);

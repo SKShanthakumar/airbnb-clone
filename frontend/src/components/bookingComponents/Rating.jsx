@@ -1,6 +1,7 @@
+import axios from "axios";
 import { useState } from "react"
 
-export default function Rating() {
+export default function Rating({ place, toggle }) {
     const [hover1, setHover1] = useState(false);
     const [hover2, setHover2] = useState(false);
     const [hover3, setHover3] = useState(false);
@@ -9,10 +10,12 @@ export default function Rating() {
 
     const [rating, setRating] = useState(0);
 
-    function addRating(e){
-        try{
-
-        } catch(e){
+    async function addRating(e) {
+        try {
+            const res = await axios.post("/place/rating", { id: place._id, newRating: rating })
+            alert("Thanks for rating your experience")
+            toggle(false);
+        } catch (e) {
             if (e.response.status >= 400) {
                 alert(e.response.data.message);
             }

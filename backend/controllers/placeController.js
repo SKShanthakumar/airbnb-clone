@@ -202,7 +202,6 @@ const deleteAccommodation = asyncHandler(async (req, res) => {
 // @access private
 const rateAccommodation = asyncHandler(async (req, res) => {
     const { id, newRating } = req.body;
-    console.log(newRating);
     const place = await Place.findById(id, 'rating owner ratedBy');
 
     if (place.owner == req.user.id) {

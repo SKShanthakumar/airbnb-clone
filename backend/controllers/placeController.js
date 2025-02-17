@@ -1,6 +1,7 @@
 import asyncHandler from "express-async-handler";
 import dotenv from 'dotenv';
 import Place from '../models/placeModel.js'
+import User from "../models/userModel.js";
 import { fileURLToPath } from 'url';
 import { dirname, extname, join, resolve } from 'path';
 import imageDownloader from 'image-downloader';
@@ -9,6 +10,9 @@ import fs from 'fs';       // for deleting files from storage
 import sharp from "sharp"; // for img compression
 import Trie from "../dsa/trie.js";
 import mergeInterval from "../dsa/mergeInterval.js";
+import transporter from "../config/nodeMailerConfig.js";
+import { format } from "date-fns";
+
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -273,16 +277,85 @@ const bookAccommodation = asyncHandler(async (req, res) => {
     const canBook = mergeInterval(intervals, [new Date(checkIn), new Date(checkOut)]);
 
     if (canBook) {
-        const booking = await Booking.create({
-            place,
-            client: req.user.id,
-            checkIn,
-            checkOut,
-            guests,
-            nights,
-            price
-        });
-        res.status(200).json({ id: booking.id })
+        // fetch place info
+        const bookedPlace = await Place.findById(place).select("title address owner").populate("owner");
+        const clientData = await User.findById(req.user.id).select("name email");
+
+        // confirmation mail
+        const clientMailOptions = {
+            from: `"Airbnb Clone by SK" <${process.env.EMAIL_USER}>`,
+            to: req.user.email,
+            subject: "Booking Confirmation - Your Stay is Confirmed!",
+            text: `Dear ${req.user.name},
+
+We're excited to confirm your booking at ${bookedPlace.title}!
+
+Booking Details:
+- Property: ${bookedPlace.title}, ${bookedPlace.address.city}, ${bookedPlace.address.country}
+- Check-in Date: ${format(new Date(checkIn), "dd-MM-yyyy")}
+- Check-out Date: ${format(new Date(checkOut), "dd-MM-yyyy")}
+- Guests: ${guests}
+- Total Amount: ₹ ${price}
+
+Contact details of the host:
+Name: ${bookedPlace.owner.name}
+Email: ${bookedPlace.owner.email}
+Languages known: ${bookedPlace.owner.language}
+
+If you have any questions or need any changes to your booking, feel free to reach out.
+
+We can't wait to host you!
+
+Best regards,
+Shanthakumar S`
+        };
+
+        const hostMailOptions = {
+            from: `"Airbnb Clone by SK" <${process.env.EMAIL_USER}>`,
+            to: bookedPlace.owner.email,
+            subject: "Booking Confirmation - Your Property Has Been Booked!",
+            text: `
+Dear Host,
+
+We are pleased to inform you that your property, "${bookedPlace.title}", has been successfully booked!
+
+Booking Details:
+- Property: ${bookedPlace.title}
+- Guest Name: ${clientData.name}
+- Guest email: ${clientData.email}
+- Check-in Date: ${format(new Date(checkIn), "dd-MM-yyyy")}
+- Check-out Date: ${format(new Date(checkOut), "dd-MM-yyyy")}
+- Total Price: ₹ ${price}
+
+Please ensure that the property is ready for the guest's arrival. If you need any assistance, feel free to reach out to us.
+
+Thank you for hosting on Airbnb Clone!
+
+Best regards,
+Shanthakumar S
+        `
+        };
+
+        try {
+            await transporter.sendMail(clientMailOptions);
+            await transporter.sendMail(hostMailOptions);
+
+            const booking = await Booking.create({
+                place,
+                client: req.user.id,
+                checkIn,
+                checkOut,
+                guests,
+                nights,
+                price
+            });
+
+            res.status(200).json({ id: booking.id })
+        } catch (error) {
+            res.status(500);
+            throw new Error("Error sending email");
+        }
+
     } else {
         res.status(400).json({ message: "accommodation already booked in these dates" })
     }
@@ -292,25 +365,90 @@ const bookAccommodation = asyncHandler(async (req, res) => {
 // @route POST /api/place/booking/cancel/:id
 // @access private
 const cancelBooking = asyncHandler(async (req, res) => {
-    const data = await Booking.findById(req.params.id);
+    const data = await Booking.findById(req.params.id)
+        .populate({
+            path: 'place',
+            select: 'title owner address',
+            populate: {
+                path: 'owner',
+                select: 'name email language'
+            }
+        })
+        .populate({
+            path: 'client',
+            select: 'name email' // select the client details you need
+        });
     if (!data) {
         res.status(400);
         throw new Error("Booking not found")
-    } else if (data.client != req.user.id) {
+    } else if (data.client.id != req.user.id) {
         res.status(400);
         throw new Error("User not authorized to cancel this booking")
     }
 
-    const cancelled = await Booking.findByIdAndDelete(req.params.id);
-    if (!cancelled) {
-        res.status(500); // Internal Server Error in case of unexpected failure
-        throw new Error("Failed to delete the place");
-    }
+    // confirmation mail
+    const clientMailOptions = {
+        from: `"Airbnb Clone by SK" <${process.env.EMAIL_USER}>`,
+        to: req.user.email,
+        subject: "Booking Cancellation - Your Stay has been Cancelled!",
+        text: `Dear ${req.user.name},
 
-    res.status(200).json({
-        message: "Booking cancelled successfully",
-        cancelled,
-    });
+We would like to confirm that your booking at ${data.place.title} has been successfully cancelled.
+
+Booking Details:
+- Property: ${data.place.title}, ${data.place.address.city}, ${data.place.address.country}
+- Check-in Date: ${format(new Date(data.checkIn), "dd-MM-yyyy")}
+- Check-out Date: ${format(new Date(data.checkOut), "dd-MM-yyyy")}
+- Guests: ${data.guests}
+- Total Amount: ₹ ${data.price}
+
+If you need further assistance or plan to book again in the future, feel free to contact us.
+
+Best regards,  
+Shanthakumar S`
+    };
+
+    const hostMailOptions = {
+        from: `"Airbnb Clone by SK" <${process.env.EMAIL_USER}>`,
+        to: data.place.owner.email,
+        subject: "Booking Cancellation - Your Property Booking Has Been Cancelled!",
+        text: `Dear ${data.place.owner.name},
+
+We are informing you that the booking for your property, "${data.place.title}", has been cancelled by the guest.
+
+Booking Details:
+- Property: ${data.place.title}
+- Guest Name: ${data.client.name}
+- Check-in Date: ${format(new Date(data.checkIn), "dd-MM-yyyy")}
+- Check-out Date: ${format(new Date(data.checkOut), "dd-MM-yyyy")}
+- Total Price: ₹ ${data.price}
+
+If you have any questions or concerns, please don't hesitate to reach out to us.
+
+Thank you for hosting on Airbnb Clone!
+
+Best regards,  
+Shanthakumar S`
+    };
+
+    try {
+        await transporter.sendMail(clientMailOptions);
+        await transporter.sendMail(hostMailOptions);
+
+        const cancelled = await Booking.findByIdAndDelete(req.params.id);
+        if (!cancelled) {
+            res.status(500);
+            throw new Error("Failed to delete the place");
+        }
+
+        res.status(200).json({
+            message: "Booking cancelled successfully",
+            cancelled,
+        });
+    } catch (error) {
+        res.status(500);
+        throw new Error("Error sending email");
+    }
 });
 
 // @desc Get all bookings of a user

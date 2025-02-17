@@ -7,7 +7,6 @@ function Register() {
     const [user, setUser] = useState({
         name: "",
         email: "",
-        phone: "",
         password: "",
         language: []
     });
@@ -31,7 +30,6 @@ function Register() {
                     setUser({
                         name: data.name,
                         email: data.email,
-                        phone: data.phone,
                         password: "",
                         language: data.language
                     })
@@ -58,7 +56,7 @@ function Register() {
 
     async function addUser(e) {
         e.preventDefault();
-        if (user.name === "" || user.email === "" || (from == "" && user.password === "") || user.phone === "" || user.language == [] || user.name.trim().length == 0 || user.email.trim().length == 0 || (from == "" && user.password.trim().length == 0) || user.phone.trim().length == 0) {
+        if (user.name === "" || user.email === "" || (from == "" && user.password === "") || user.language == [] || user.name.trim().length == 0 || user.email.trim().length == 0 || (from == "" && user.password.trim().length == 0)) {
             alert("All fields are mandatory");
             return;
         }
@@ -67,17 +65,12 @@ function Register() {
             alert("Passwords do not match");
             return;
         }
-        if (user.phone.length < 10) {
-            alert("Enter valid phone number");
-            return;
-        }
 
         try {
             if (from == "") {
                 await axios.post('/user/register', {
                     name: user.name,
                     email: user.email,
-                    phone: user.phone,
                     password: user.password,
                     language: user.language
                 });
@@ -86,7 +79,6 @@ function Register() {
                 const { data } = await axios.put('/user/update', {
                     name: user.name,
                     email: user.email,
-                    phone: user.phone,
                     language: user.language
                 });
 
@@ -96,7 +88,6 @@ function Register() {
             setUser({
                 name: "",
                 email: "",
-                phone: "",
                 password: "",
                 language: []
             });
@@ -110,7 +101,6 @@ function Register() {
             setUser({
                 name: "",
                 email: "",
-                phone: "",
                 password: "",
                 language: []
             });
@@ -130,21 +120,14 @@ function Register() {
                     onChange={(e) => { setUser({ ...user, name: e.target.value }) }}
                 />
                 <br />
-                <input type="string"
-                    placeholder="phone number"
-                    className="border rounded-2xl py-2 px-3 mt-2"
-                    value={user.phone}
-                    onChange={(e) => { setUser({ ...user, phone: e.target.value }) }}
-                />
                 <input type="email"
                     placeholder="your@email.com"
-                    className="border rounded-2xl py-2 px-3 mt-2"
+                    className="border rounded-2xl py-2 px-3 my-2"
                     value={user.email}
                     onChange={(e) => { setUser({ ...user, email: e.target.value }) }}
                 />
                 {from == "" && (
                     <div>
-                        <br />
                         <input type="password"
                             placeholder="password"
                             className="border rounded-2xl py-2 px-3 w-full"

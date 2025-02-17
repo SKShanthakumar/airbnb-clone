@@ -39,9 +39,9 @@ function oldCalculator(user) {
 // @route POST /api/user/register
 // @access public
 const registerUser = asyncHandler(async (req, res) => {
-    const { name, email, phone, password, profilePic, language } = req.body;
+    const { name, email, password, profilePic, language } = req.body;
 
-    if (!name || !email || !password || !phone) {
+    if (!name || !email || !password) {
         res.status(400);
         throw new Error("All fields are required");
     }
@@ -51,12 +51,6 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new Error("Email already registered");
     }
 
-    const userAvailablePhone = await User.findOne({ phone });
-    if (userAvailablePhone) {
-        res.status(400);
-        throw new Error("Phone number already registered");
-    }
-
     //hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -64,7 +58,6 @@ const registerUser = asyncHandler(async (req, res) => {
     const user = await User.create({
         name,
         email,
-        phone,
         password: hashedPassword,
         profilePic,
         language
@@ -94,7 +87,6 @@ const loginUser = asyncHandler(async (req, res) => {
                 id: user.id,
                 name: user.name,
                 email: user.email,
-                phone: user.phone,
                 language: user.language,
                 profilePic: user.profilePic,
                 favourites: user.favourites,
@@ -121,14 +113,13 @@ const loginUser = asyncHandler(async (req, res) => {
 // @route PUT /api/user/update
 // @access private
 const updateUser = asyncHandler(async (req, res) => {
-    const { name, email, phone, profilePic, language } = req.body;
+    const { name, email, profilePic, language } = req.body;
 
-    // email & phone check
+    // email check
     const emailCheck = await User.findOne({ email });
-    const phoneCheck = await User.findOne({ phone });
-    if ((emailCheck && emailCheck.id != req.user.id) || (phoneCheck && phoneCheck.id != req.user.id)) {
+    if ((emailCheck && emailCheck.id != req.user.id)) {
         res.status(401);
-        throw new Error("user not authorized to update data with this email and phone number");
+        throw new Error("user not authorized to update data with this email");
     }
 
     const fetchedUser = await User.findById(req.user.id);
@@ -140,7 +131,6 @@ const updateUser = asyncHandler(async (req, res) => {
     const data = {
         name,
         email,
-        phone,
         profilePic,
         language
     }
@@ -152,7 +142,6 @@ const updateUser = asyncHandler(async (req, res) => {
             id: updated.id,
             name: updated.name,
             email: updated.email,
-            phone: updated.phone,
             language: updated.language,
             profilePic: updated.profilePic,
             favourites: updated.favourites,
@@ -168,7 +157,6 @@ const updateUser = asyncHandler(async (req, res) => {
     }).json({
         name: updated.name,
         email: updated.email,
-        phone: updated.phone,
         language: updated.language
     });
 });
@@ -242,7 +230,6 @@ const setProfilePic = asyncHandler(async (req, res) => {
             id: updated.id,
             name: updated.name,
             email: updated.email,
-            phone: updated.phone,
             language: updated.language,
             profilePic: updated.profilePic,
             favourites: updated.favourites,
@@ -286,7 +273,6 @@ const removeProfilePic = asyncHandler(async (req, res) => {
             id: updated.id,
             name: updated.name,
             email: updated.email,
-            phone: updated.phone,
             language: updated.language,
             profilePic: updated.profilePic,
             favourites: updated.favourites,
@@ -331,7 +317,6 @@ const addToFavourites = asyncHandler(async (req, res) => {
             id: updated.id,
             name: updated.name,
             email: updated.email,
-            phone: updated.phone,
             language: updated.language,
             profilePic: updated.profilePic,
             favourites: updated.favourites,
@@ -376,7 +361,6 @@ const removeFromFavourites = asyncHandler(async (req, res) => {
             id: updated.id,
             name: updated.name,
             email: updated.email,
-            phone: updated.phone,
             language: updated.language,
             profilePic: updated.profilePic,
             favourites: updated.favourites,

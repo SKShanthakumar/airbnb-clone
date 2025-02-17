@@ -41,6 +41,11 @@ export default function UserBooking() {
 
     return (
         <div className="container mx-auto p-5">
+            {userBookings.length == 0 && (
+                <div className="border rounded-2xl text-center p-5 w-2/3 mx-auto">
+                    You have not booked any Accommodation
+                </div>
+            )}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
                 {userBookings.length > 0 && userBookings.map((booking, index) => (
                     <Link key={index}

@@ -85,25 +85,25 @@ function Register() {
 
     async function addUser(e) {
         e.preventDefault();
-        if (user.name === "" || user.email === "" || (from == "" && user.password === "") || user.language == [] || user.name.trim().length == 0 || user.email.trim().length == 0 || (from == "" && user.password.trim().length == 0)) {
+        if (user.name === "" || (from == "" && user.email === "") || (from == "" && user.password === "") || user.language == [] || user.name.trim().length == 0 || (from == "" && user.email.trim().length == 0) || (from == "" && user.password.trim().length == 0)) {
             alert("All fields are mandatory");
             return;
         }
 
-        if (user.password != checkPass) {
-            alert("Passwords do not match");
-            return;
-        }
-
-        if(!otpVerified){
-            alert("verify your email using OTP");
-            return
-        }
-
         try {
             if (from == "") {
+                if (user.password != checkPass) {
+                    alert("Passwords do not match");
+                    return;
+                }
+
+                if (!otpVerified) {
+                    alert("verify your email using OTP");
+                    return
+                }
+
                 await axios.post('/user/register', {
-                    name: user.name,
+                    name: user.name,    
                     email: user.email,
                     password: user.password,
                     language: user.language
@@ -112,7 +112,6 @@ function Register() {
             } else {
                 const { data } = await axios.put('/user/update', {
                     name: user.name,
-                    email: user.email,
                     language: user.language
                 });
 
@@ -145,7 +144,6 @@ function Register() {
             setOtp("");
             setOtpSent(false);
             setOtpVerified(false);
-            console.log(e);
         }
     }
 
@@ -160,17 +158,23 @@ function Register() {
                     value={user.name}
                     onChange={(e) => { setUser({ ...user, name: e.target.value }) }}
                 />
-                <br />
-                <div className="grid grid-cols-3 gap-1">
-                    <input type="email"
-                        placeholder="your@email.com"
-                        className="border rounded-2xl py-2 px-3 col-span-2 max-h-fit"
-                        value={user.email}
-                        onChange={(e) => { setUser({ ...user, email: e.target.value }) }}
-                    />
-                    <button onClick={(e) => { sendOtp(e) }} className="border bg-primary text-white rounded-2xl p-1 h-full">Send OTP</button>
-                </div>
-                {(otpSent && !otpVerified) && (
+
+
+                {from == "" && (
+                    <>
+                        <br />
+                        <div className="grid grid-cols-3 gap-1">
+                            <input type="email"
+                                placeholder="your@email.com"
+                                className="border rounded-2xl py-2 px-3 col-span-2 max-h-fit"
+                                value={user.email}
+                                onChange={(e) => { setUser({ ...user, email: e.target.value }) }}
+                            />
+                            <button onClick={(e) => { sendOtp(e) }} className="border bg-primary text-white rounded-2xl p-1 h-full">Send OTP</button>
+                        </div>
+                    </>
+                )}
+                {(from == "" && otpSent && !otpVerified) && (
                     <>
                         <div className="grid grid-cols-3 gap-1 mt-2">
                             <input type="string"
@@ -184,7 +188,7 @@ function Register() {
                         <p className="text-justify text-gray-400 px-2 mt-2">You would have received an OTP if you have entered a valid email address</p>
                     </>
                 )}
-                {otpVerified && (
+                {(from == "" && otpVerified) && (
                     <div className="flex items-center gap-1 text-green-500 px-2 mt-2">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
@@ -192,25 +196,28 @@ function Register() {
                         <p>email verified</p>
                     </div>
 
-                )
+                )}
 
-                }
-                <br />
                 {from == "" && (
-                    <div>
-                        <input type="password"
-                            placeholder="password"
-                            className="border rounded-2xl py-2 px-3 w-full"
-                            value={user.password}
-                            onChange={(e) => { setUser({ ...user, password: e.target.value }) }}
-                        />
-                        <input type="string"
-                            placeholder="re-enter password"
-                            className="border rounded-2xl py-2 px-3 mt-2 w-full"
-                            value={checkPass}
-                            onChange={(e) => { setCheckPass(e.target.value) }}
-                        />
-                    </div>)}
+                    <>
+                        <br />
+                        <div>
+                            <input type="password"
+                                placeholder="password"
+                                className="border rounded-2xl py-2 px-3 w-full"
+                                value={user.password}
+                                onChange={(e) => { setUser({ ...user, password: e.target.value }) }}
+                            />
+                            <input type="string"
+                                placeholder="re-enter password"
+                                className="border rounded-2xl py-2 px-3 mt-2 w-full"
+                                value={checkPass}
+                                onChange={(e) => { setCheckPass(e.target.value) }}
+                            />
+                        </div>
+                    </>
+                )}
+
                 <br />
                 <div className="grid grid-cols-3 gap-1">
                     <input type="string"

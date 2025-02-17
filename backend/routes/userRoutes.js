@@ -1,7 +1,7 @@
 import express from 'express'
 import validateToken from '../middleware/validateTokenhandler.js'
-import { registerUser, loginUser, currentUser, logoutUser, getUserById, updateUser, setProfilePic, removeProfilePic, addToFavourites, removeFromFavourites, getFavourites } from '../controllers/userController.js'
-import uploadProfile from '../middleware/multerConfigUser.js';
+import { registerUser, loginUser, currentUser, logoutUser, getUserById, updateUser, setProfilePic, removeProfilePic, addToFavourites, removeFromFavourites, getFavourites, sendOtp, verifyOtp } from '../controllers/userController.js'
+import uploadProfile from '../config/multerConfigUser.js';
 
 const router = express.Router();
 
@@ -18,5 +18,8 @@ router.route("/current").get(validateToken, currentUser);
 router.route("/logout").post(validateToken, logoutUser);
 router.route("/:id").get(getUserById);
 router.route("/update").put(validateToken, updateUser);
+
+router.route("/send-otp").post(sendOtp);
+router.route("/verify-otp").post(verifyOtp);
 
 export default router;

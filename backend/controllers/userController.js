@@ -7,10 +7,14 @@ import { dirname, join } from 'path';
 import fs from 'fs';       // for deleting files from storage
 import dotenv from 'dotenv';
 import sharp from "sharp"; // for img compression
+import NodeCache from 'node-cache';
+import transporter from "../config/nodeMailerConfig.js"; // for node mailer
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(dirname(__filename));
+
+const otpCache = new NodeCache({ stdTTL: 300, checkperiod: 60 }) // OTPs expire after 5 minutes
 
 function oldCalculator(user) {
     let old = "";
@@ -39,7 +43,7 @@ function oldCalculator(user) {
 // @route POST /api/user/register
 // @access public
 const registerUser = asyncHandler(async (req, res) => {
-    const { name, email, password, profilePic, language } = req.body;
+    const { name, email, password, language } = req.body;
 
     if (!name || !email || !password) {
         res.status(400);
@@ -53,13 +57,12 @@ const registerUser = asyncHandler(async (req, res) => {
 
     //hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-
+    
     // When you write username and email directly inside the object, it's using object property shorthand, assumes the key and the value are the same.
     const user = await User.create({
         name,
         email,
         password: hashedPassword,
-        profilePic,
         language
     });
 
@@ -390,6 +393,69 @@ const getFavourites = asyncHandler(async (req, res) => {
     res.status(200).json(user.favourites)
 });
 
+// @desc send OTP to mail for verification
+// @route POST /api/user/send-otp
+// @access private
+const sendOtp = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+
+    if (!email) {
+        res.status(400);
+        throw new Error("Email is required");
+    }
+
+    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    const hashedOtp = await bcrypt.hash(otp, 10);
+
+    otpCache.set(email, hashedOtp)  // storing in cache
+
+    const mailOptions = {
+        from: `"Airbnb Clone by SK" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: "OTP for verification",
+        text: `Your OTP is: ${otp}. It is valid for 5 minutes`
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        res.status(200).json({ message: "OTP sent successfully" });
+    } catch (error) {
+        res.status(500);
+        throw new Error("Error sending email");
+    }
+});
+
+// @desc send OTP to mail for verification
+// @route POST /api/user/verify-otp
+// @access private
+const verifyOtp = asyncHandler(async (req, res) => {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+        res.status(400);
+        throw new Error("Email and OTP are required");
+    }
+
+    const storedOtp = otpCache.get(email);
+
+    // Check if OTP is expired
+    if (!storedOtp) {
+        res.status(404);
+        throw new Error("OTP not found or expired");
+    }
+
+    // Compare the provided OTP with the stored OTP
+    const isOtpValid = await bcrypt.compare(otp, storedOtp);
+
+    if (isOtpValid) {
+        otpCache.del(email);  // OTP is valid, remove it from cache
+        res.status(200).json({ message: "OTP verified successfully" });
+    } else {
+        res.status(400);
+        throw new Error("Invalid OTP");
+    }
+});
+
 // @desc Get user data by id
 // @route GET /api/user/:id
 // @access public
@@ -405,4 +471,4 @@ const getUserById = asyncHandler(async (req, res) => {
     res.json({ name: user.name, email: user.email, old, id: user.id, profilePic: user.profilePic }).status(200);
 });
 
-export { registerUser, loginUser, updateUser, currentUser, logoutUser, getUserById, setProfilePic, removeProfilePic, addToFavourites, removeFromFavourites, getFavourites }
+export { registerUser, loginUser, updateUser, currentUser, logoutUser, getUserById, setProfilePic, removeProfilePic, addToFavourites, removeFromFavourites, getFavourites, sendOtp, verifyOtp }

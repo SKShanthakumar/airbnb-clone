@@ -12,6 +12,9 @@ function Register() {
     });
     const [lang, setLang] = useState('');
     const [checkPass, setCheckPass] = useState('');
+    const [otp, setOtp] = useState("");
+    const [otpSent, setOtpSent] = useState(false);
+    const [otpVerified, setOtpVerified] = useState(false);
     const navigate = useNavigate();
 
     const location = useLocation();
@@ -45,6 +48,10 @@ function Register() {
 
     function addLang(e) {
         e.preventDefault();
+        if (lang.trim() == "") {
+            alert("Language cannot be empty");
+            return;
+        }
         setUser({ ...user, language: [...user.language, lang] });
         setLang('');
     }
@@ -52,6 +59,28 @@ function Register() {
     function removeLang(e, lang) {
         e.preventDefault();
         setUser({ ...user, language: user.language.filter(l => l != lang) });
+    }
+
+    async function sendOtp(e) {
+        e.preventDefault();
+        try {
+            const { data } = await axios.post("/user/send-otp", { email: user.email });
+            setOtpSent(true);
+            alert(data.message);
+        } catch (e) {
+            alert(e.response.data.message);
+        }
+    }
+
+    async function verifyOtp(e) {
+        e.preventDefault();
+        try {
+            const { data } = await axios.post("/user/verify-otp", { email: user.email, otp });
+            alert(data.message);
+            setOtpVerified(true);
+        } catch (e) {
+            alert(e.response.data.message);
+        }
     }
 
     async function addUser(e) {
@@ -64,6 +93,11 @@ function Register() {
         if (user.password != checkPass) {
             alert("Passwords do not match");
             return;
+        }
+
+        if(!otpVerified){
+            alert("verify your email using OTP");
+            return
         }
 
         try {
@@ -92,6 +126,9 @@ function Register() {
                 language: []
             });
             setCheckPass("")
+            setOtp("");
+            setOtpSent(false);
+            setOtpVerified(false);
             navigate(to);
         } catch (e) {
             if (e.response.status === 400)
@@ -104,6 +141,10 @@ function Register() {
                 password: "",
                 language: []
             });
+            setCheckPass("")
+            setOtp("");
+            setOtpSent(false);
+            setOtpVerified(false);
             console.log(e);
         }
     }
@@ -120,12 +161,41 @@ function Register() {
                     onChange={(e) => { setUser({ ...user, name: e.target.value }) }}
                 />
                 <br />
-                <input type="email"
-                    placeholder="your@email.com"
-                    className="border rounded-2xl py-2 px-3 my-2"
-                    value={user.email}
-                    onChange={(e) => { setUser({ ...user, email: e.target.value }) }}
-                />
+                <div className="grid grid-cols-3 gap-1">
+                    <input type="email"
+                        placeholder="your@email.com"
+                        className="border rounded-2xl py-2 px-3 col-span-2 max-h-fit"
+                        value={user.email}
+                        onChange={(e) => { setUser({ ...user, email: e.target.value }) }}
+                    />
+                    <button onClick={(e) => { sendOtp(e) }} className="border bg-primary text-white rounded-2xl p-1 h-full">Send OTP</button>
+                </div>
+                {(otpSent && !otpVerified) && (
+                    <>
+                        <div className="grid grid-cols-3 gap-1 mt-2">
+                            <input type="string"
+                                placeholder="enter OTP"
+                                className="border rounded-2xl py-2 px-3 col-span-2 max-h-fit"
+                                value={otp}
+                                onChange={(e) => { setOtp(e.target.value) }}
+                            />
+                            <button onClick={(e) => { verifyOtp(e) }} className="border bg-primary text-white rounded-2xl p-1 h-full">Verify OTP</button>
+                        </div>
+                        <p className="text-justify text-gray-400 px-2 mt-2">You would have received an OTP if you have entered a valid email address</p>
+                    </>
+                )}
+                {otpVerified && (
+                    <div className="flex items-center gap-1 text-green-500 px-2 mt-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                        <p>email verified</p>
+                    </div>
+
+                )
+
+                }
+                <br />
                 {from == "" && (
                     <div>
                         <input type="password"

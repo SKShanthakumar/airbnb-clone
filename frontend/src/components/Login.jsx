@@ -56,10 +56,14 @@ function Login({ from = "" , to = "/"}) {
                 />
                 <input type="password"
                     placeholder="password"
-                    className="border rounded-2xl py-2 px-3 mt-2"
+                    className="border rounded-2xl py-2 px-3 mt-3"
                     value={user.password}
                     onChange={(e) => setUser({ ...user, password: e.target.value })}
                 />
+                <Link to="/forgotPassword" state={{status: "loggedOut"}} className="ps-2 mt-1 text-gray-500 hover:text-black hover:underline max-w-fit">
+                    Forgot password?
+                </Link>
+
                 <button className="border bg-primary text-white rounded-2xl p-1 mt-5 mb-1 hover:shadow-md">Login</button>
                 <div className="text-center text-gray-500">
                     Don't have an account? <Link to="/register" className="text-black underline">Register</Link>

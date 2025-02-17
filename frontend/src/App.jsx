@@ -14,6 +14,8 @@ import UserBooking from './components/bookingComponents/UserBooking';
 import BookingPage from './components/bookingComponents/BookingPage';
 import Favourites from './components/Favourites';
 import PastBooking from './components/bookingComponents/PastBooking';
+import ChangePassword from './components/changePassword';
+import ForgotPassword from './components/ForgotPassword';
 
 axios.defaults.baseURL = `${import.meta.env.VITE_API_DOMAIN}/api`;
 axios.defaults.withCredentials = true;                  // to include cookies with the request
@@ -37,8 +39,11 @@ function App() {
               <Route path="bookings/:id" element={<BookingPage />} />
               <Route path="pastBookings" element={<PastBooking />} />
               <Route path="favourites" element={<Favourites />} />
+              <Route path="changePassword" element={<ChangePassword />} />
             </Route>
             <Route path='place/:id' element={<PlacePage />} />
+            <Route path='forgotPassword' element={<ForgotPassword />} />
+            <Route path='forgotPassword/reset' element={<ChangePassword />} />
           </Route>
         </Routes>
       </UserContextProvider>

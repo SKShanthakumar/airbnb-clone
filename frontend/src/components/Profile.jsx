@@ -111,6 +111,9 @@ export default function Profile() {
                                 Remove Profile Picture
                             </label>
                         }
+                        <Link to="/profile/changePassword" state={{status:"loggedIn"}} className="border cursor-pointer rounded-xl bg-primary text-white px-4 py-2 hover:shadow-md">
+                            Change Password
+                        </Link>
                     </div>
                 </div>
 

@@ -27,9 +27,6 @@ export function UserContextProvider({ children }) {
                 setFav(response.data.favourites)
                 setReady(true);
             } catch (e) {
-                if (e.response.status >= 400) {
-                    console.log(e.response.data.message);
-                }
                 setReady(true);
             }
         };

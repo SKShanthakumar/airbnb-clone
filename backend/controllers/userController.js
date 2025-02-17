@@ -57,7 +57,7 @@ const registerUser = asyncHandler(async (req, res) => {
 
     //hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-    
+
     // When you write username and email directly inside the object, it's using object property shorthand, assumes the key and the value are the same.
     const user = await User.create({
         name,
@@ -393,6 +393,43 @@ const getFavourites = asyncHandler(async (req, res) => {
     res.status(200).json(user.favourites)
 });
 
+// @desc change password of user by verifying current password
+// @route POST /api/user/change-pass
+// @access private
+const changePass = asyncHandler(async (req, res) => {
+    const { curPass, newPass } = req.body;
+
+    const user = await User.findById(req.user.id).select("password");
+
+    const curPassValid = await bcrypt.compare(curPass, user.password);
+    if (curPassValid) {
+        const hashedPassword = await bcrypt.hash(newPass, 10);
+        await User.findByIdAndUpdate(req.user.id, { password: hashedPassword });
+        res.status(200).json({ message: "password changed successfully" })
+    } else {
+        res.status(400);
+        throw new Error("current password is incorrect");
+    }
+});
+
+// @desc change password of user after OTP verification
+// @route POST /api/user/change-pass
+// @access private
+const changePassOtpVerified = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+        res.status(400);
+        throw new Error("No user found with the entered email ID");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await User.findByIdAndUpdate(user.id, { password: hashedPassword });
+    res.status(200).json({ message: "password changed successfully" })
+});
+
 // @desc send OTP to mail for verification
 // @route POST /api/user/send-otp
 // @access private
@@ -425,7 +462,7 @@ const sendOtp = asyncHandler(async (req, res) => {
     }
 });
 
-// @desc send OTP to mail for verification
+// @desc to verify entered OTP is correct
 // @route POST /api/user/verify-otp
 // @access private
 const verifyOtp = asyncHandler(async (req, res) => {
@@ -433,7 +470,7 @@ const verifyOtp = asyncHandler(async (req, res) => {
 
     if (!email || !otp) {
         res.status(400);
-        throw new Error("Email and OTP are required");
+        throw new Error("All fields are required");
     }
 
     const storedOtp = otpCache.get(email);
@@ -471,4 +508,4 @@ const getUserById = asyncHandler(async (req, res) => {
     res.json({ name: user.name, email: user.email, old, id: user.id, profilePic: user.profilePic }).status(200);
 });
 
-export { registerUser, loginUser, updateUser, currentUser, logoutUser, getUserById, setProfilePic, removeProfilePic, addToFavourites, removeFromFavourites, getFavourites, sendOtp, verifyOtp }
+export { registerUser, loginUser, updateUser, currentUser, logoutUser, getUserById, setProfilePic, removeProfilePic, addToFavourites, removeFromFavourites, getFavourites, changePass, changePassOtpVerified, sendOtp, verifyOtp }

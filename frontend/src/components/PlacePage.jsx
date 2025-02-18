@@ -8,12 +8,16 @@ import Login from "./Login";
 import PhotosGrid from "./galleryComponents/PhotosGrid";
 import Gallery from "./galleryComponents/Gallery";
 import GmapEmbed from "./GmapEmbed";
+import PlacePageSkeleton from "./skeletons/PlacePageSkeleton";
 
 export default function PlacePage() {
     const { id } = useParams();
     const [place, setPlace] = useState({});
     const [owner, setOwner] = useState({ name: '', email: '', old: '' });
     const [showPhotos, setShowPhotos] = useState(false);
+
+    const [loading, setLoading] = useState(true);
+
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -24,8 +28,9 @@ export default function PlacePage() {
             try {
                 const res = await axios.get(`/place/public/${id}`);
                 const ownerRes = await axios.get(`/user/${res.data.owner}`)
-                setPlace(res.data)
+                setPlace(res.data);
                 setOwner(ownerRes.data);
+                setLoading(false);
             } catch (e) {
                 if (e.response.status >= 400) {
                     alert(e.response.data.message);
@@ -34,12 +39,6 @@ export default function PlacePage() {
         }
         fetchData();
     }, [])
-
-    if (showPhotos) {
-        return (
-            <Gallery photos={place.photos} toggle={setShowPhotos} />
-        )
-    }
 
     async function removePlace(e) {
         try {
@@ -72,6 +71,16 @@ export default function PlacePage() {
                 alert(e.response.data.message);
             }
         }
+    }
+
+    if (loading) {
+        return <PlacePageSkeleton />
+    }
+
+    if (showPhotos) {
+        return (
+            <Gallery photos={place.photos} toggle={setShowPhotos} />
+        )
     }
 
     return (

@@ -16,6 +16,9 @@ import Favourites from './components/Favourites';
 import PastBooking from './components/bookingComponents/PastBooking';
 import ChangePassword from './components/changePassword';
 import ForgotPassword from './components/ForgotPassword';
+import IndexSkeleton from './components/skeletons/indexSkeleton';
+import PlacePageSkeleton from './components/skeletons/PlacePageSkeleton';
+import FetchingSkeleton from './components/skeletons/FetchingSkeleton';
 
 axios.defaults.baseURL = `${import.meta.env.VITE_API_DOMAIN}/api`;
 axios.defaults.withCredentials = true;                  // to include cookies with the request
@@ -42,8 +45,12 @@ function App() {
               <Route path="changePassword" element={<ChangePassword />} />
             </Route>
             <Route path='place/:id' element={<PlacePage />} />
+
+            <Route path="place/test" element={<FetchingSkeleton text={"fetching your accommodations"} />} />
+
             <Route path='forgotPassword' element={<ForgotPassword />} />
             <Route path='forgotPassword/reset' element={<ChangePassword />} />
+
           </Route>
         </Routes>
       </UserContextProvider>

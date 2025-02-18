@@ -26,13 +26,12 @@ export default function Rating({ place }) {
 
     async function addRating(e, rating) {
         try {
+            setRated(true);
             const res = await axios.post("/place/rating", { id: place._id, newRating: rating })
             alert("Thanks for rating your experience")
-            setRated(true);
         } catch (e) {
             if (e.response.status >= 400) {
                 alert(e.response.data.message);
-                setRated(true);
             }
         }
     }

@@ -2,10 +2,13 @@ import axios from "axios";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import FetchingSkeleton from "../skeletons/FetchingSkeleton";
 
 export default function UserBooking() {
     const [userBookings, setUserBookings] = useState([]);
     const [pastBookings, setPastBookings] = useState([]);
+
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function fetchData() {
@@ -13,6 +16,7 @@ export default function UserBooking() {
                 const res = await axios.get("/place/my-bookings");
                 setUserBookings(res.data.upcoming);
                 setPastBookings(res.data.past);
+                setLoading(false);
             } catch (e) {
                 if (e.response.status == 400) {
                     alert(e.response.data.message);
@@ -37,6 +41,10 @@ export default function UserBooking() {
                 alert(e.response.data.message);
             }
         }
+    }
+
+    if(loading){
+        return <FetchingSkeleton text={"Fetching your bookings"} />
     }
 
     return (

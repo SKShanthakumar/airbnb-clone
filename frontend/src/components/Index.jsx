@@ -2,14 +2,18 @@ import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { UserContext } from "../userContext";
+import IndexSkeleton from "./skeletons/indexSkeleton";
 
 function Index() {
     const [places, setPlaces] = useState([]);
     const { fav, setFav, searchQuery, guestCount } = useContext(UserContext)
 
+    const [loading, setLoading] = useState(true);
+
     useEffect(() => {
         async function fetchData() {
             try {
+                setLoading(true);
                 let res = {};
                 if (searchQuery == "") {
                     res = await axios.get("/place");
@@ -17,7 +21,8 @@ function Index() {
                     res = await axios.get(`/place/public/search/${searchQuery}`)
                 }
 
-                setPlaces(res.data.filter(place => place.maxGuests >= guestCount))
+                setPlaces(res.data.filter(place => place.maxGuests >= guestCount));
+                setLoading(false);
             } catch (e) {
                 if (e.response.status >= 400) {
                     alert(e.response.data.message);
@@ -42,6 +47,9 @@ function Index() {
             }
         }
     }
+
+    if (loading)
+        return <IndexSkeleton />
 
     return (
         <div className="container mx-auto px-5">

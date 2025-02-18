@@ -2,16 +2,20 @@ import { useContext, useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import axios from "axios";
 import { UserContext } from "../userContext";
+import FetchingSkeleton from "./skeletons/FetchingSkeleton";
 
 export default function Favourites() {
     const [fullFav, setFullFav] = useState([]);
     const { fav, setFav } = useContext(UserContext);
+
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function fetchData() {
             try {
                 const res = await axios.get("/user/favourites");
                 setFullFav(res.data);
+                setLoading(false);
             } catch (e) {
                 if (e.response.status >= 400) {
                     alert(e.response.data.message);
@@ -36,6 +40,9 @@ export default function Favourites() {
             }
         }
     }
+
+    if (loading)
+        return <FetchingSkeleton text={"Fetching your favourites"} />
 
     return (
         <div className="container mx-auto px-5">

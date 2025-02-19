@@ -12,6 +12,8 @@ export default function BookingWidget({ place, owner }) {
     const [guests, setGuests] = useState('');
     let numberOfNights = 0;
 
+    const [loading, setLoading] = useState(false);
+
     if (checkIn && checkOut) {
         numberOfNights = differenceInCalendarDays(checkOut, checkIn);
     }
@@ -34,6 +36,8 @@ export default function BookingWidget({ place, owner }) {
             alert(`This place can accommodate only ${place.maxGuests} guests`);
             return;
         }
+
+        setLoading(true);
         const data = {
             "place": place._id,
             "owner": owner.id,
@@ -45,8 +49,8 @@ export default function BookingWidget({ place, owner }) {
         }
         try {
             const res = await axios.post("/place/book", data);
+            setLoading(false);
             if (res) {
-                alert("Booking successfull");
                 navigate("/profile/bookings");
             } else {
                 alert("Error in booking");
@@ -58,6 +62,7 @@ export default function BookingWidget({ place, owner }) {
             if (e.response.status >= 400) {
                 alert(e.response.data.message);
             }
+            setLoading(false);
             setCheckIn('');
             setCheckOut('');
             setGuests('');
@@ -91,7 +96,8 @@ export default function BookingWidget({ place, owner }) {
                         onChange={(e) => { setGuests(e.target.value) }} />
                 </div>
             </div>
-            <button type="submit" onClick={(e) => bookThisPlace(e)} className="border bg-primary text-white rounded-2xl w-full mt-5 py-2">Book</button>
+            <button type="submit" onClick={(e) => bookThisPlace(e)} className={`${loading ? "hidden" : ""} border bg-primary text-white rounded-2xl w-full mt-5 py-2`}>Book</button>
+            <div className={`${loading ? "" : "hidden"} border bg-primary text-white rounded-2xl w-full mt-5 py-2 animate-pulse text-center`}>Booking...</div>
             {numberOfNights > 0 &&
                 <div className="text-center">
                     <p className="text-gray-500 my-3">You won't be charged yet</p>

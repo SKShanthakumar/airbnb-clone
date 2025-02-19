@@ -7,6 +7,8 @@ export default function Accommodation() {
     const [userPlaces, setUserPlaces] = useState([]);
 
     const [loading, setLoading] = useState(true);
+    const [delLoading, setDelLoading] = useState(false);
+    const [delId, setDelId] = useState("");
 
     useEffect(() => {
         async function fetchData() {
@@ -28,14 +30,19 @@ export default function Accommodation() {
 
         const isConfirmed = confirm("Do you want to delete?");
         if (isConfirmed) {
+            setDelLoading(true);
+            setDelId(place._id);
             try {
                 await axios.post(`/place/delete/${place._id}`)
                 setUserPlaces(userPlaces.filter(item => item != place));
-                alert("Accommodation deleted")
+                setDelLoading(false);
+                setDelId("");
             } catch (e) {
                 if (e.response.status >= 400) {
                     alert(e.response.data.message);
                 }
+                setDelLoading(false);
+                setDelId("");
             }
         }
     }
@@ -50,12 +57,17 @@ export default function Accommodation() {
                     Add new place
                 </Link>
             </div>
-            {loading && ( <FetchingSkeleton text={"Fetching your accommodations"} /> )}
+            {loading && (<FetchingSkeleton text={"Fetching your accommodations"} />)}
             {!loading && (
                 <div className="mt-8">
                     {userPlaces.length > 0 &&
                         userPlaces.map(place => (
                             <div key={place._id} className="relative">
+                                {/* loading overlay */}
+                                {delLoading && delId == place._id && (
+                                    <div className="absolute w-full h-full rounded-2xl bg-gray-200 z-10 animate-pulse"></div>
+                                )}
+
                                 <Link to={`/place/${place._id}`} className="flex border rounded-2xl my-3 overflow-hidden gap-5 bg-gray-100 w-full">
                                     <div className="h-32 w-32 border-e flex-shrink-0">
                                         <img
@@ -66,7 +78,7 @@ export default function Accommodation() {
                                     </div>
                                     <div className="flex flex-col justify-between my-2 me-5 flex-grow">
                                         <div className="max-h-20 max-w-full overflow-hidden">
-                                            <h3 className="text-xl truncate w-7/12 lg:w-full">{place.title}</h3>
+                                            <h3 className="text-xl truncate w-11/12 lg:w-full">{place.title}</h3>
                                             <p className="text-gray-500 mt-2 text-justify hidden md:block">{place.description}</p>
                                         </div>
                                         <div className="flex gap-1 items-center">

@@ -9,6 +9,10 @@ export default function Profile() {
     const { ready, userName, userEmail, setUserName, setUserEmail, profile, setProfile, old, setOld, fav, setFav } = useContext(UserContext);
     const navigate = useNavigate();
 
+    const [remProfLoad, setRemProf] = useState(false);
+    const [chgProfLoad, setchgProf] = useState(false);
+    const [logoutLoad, setLogoutLoad] = useState(false);
+
     if (!ready) {
         return <div>Loading...</div>;
     }
@@ -21,6 +25,7 @@ export default function Profile() {
         const selectedFile = e.target.files[0]; // Get the first (and only) selected file
         if (!selectedFile) return;
 
+        setchgProf(true);
         const formData = new FormData();
         formData.append('photo', selectedFile); // Append the file using the field name 'photo'
 
@@ -31,26 +36,32 @@ export default function Profile() {
                 },
             });
             setProfile(res.data.img);
+            setchgProf(false);
         } catch (e) {
             if (e.response.status >= 400) {
                 alert(e.response.data.message);
             }
+            setchgProf(false);
         }
     }
 
     async function removeProfilePic(e) {
         e.preventDefault();
+        setRemProf(true);
         try {
             const res = await axios.post('/user/remove-profile-pic', {});
             setProfile(res.data.img);
+            setRemProf(false);
         } catch (e) {
             if (e.response.status >= 400) {
                 alert(e.response.data.message);
             }
+            setRemProf(false);
         }
     }
 
     async function logout(e) {
+        setLogoutLoad(true);
         try {
             await axios.post("/user/logout");
             setLoggedOut(true);
@@ -59,11 +70,13 @@ export default function Profile() {
             setProfile("");
             setOld("");
             setFav([]);
+            setLogoutLoad(false);
             navigate("/");
         } catch (e) {
             if (e.response.status >= 400) {
                 alert(e.response.data.message);
             }
+            setLogoutLoad(false);
         }
     }
 
@@ -89,8 +102,10 @@ export default function Profile() {
                 <p className="mt-1">{old} of hosting</p>
 
                 <div className="flex gap-2 mt-5 w-full px-2">
-                    <button onClick={(e) => logout(e)} className="w-full rounded-2xl bg-primary text-white px-4 py-2 hover:scale-105 hover:shadow-md transition-transform duration-300 ease-in-out">
+                    <button onClick={(e) => logout(e)} className={`${logoutLoad ? "hidden" : ""}  w-full rounded-2xl bg-primary text-white px-4 py-2 hover:scale-105 hover:shadow-md transition-transform duration-300 ease-in-out`}>
                         Logout</button>
+                    <div className={`${logoutLoad ? "" : "hidden"} text-center w-full rounded-2xl bg-primary text-white px-4 py-2 animate-pulse`}>
+                        Logout</div>
                     <button onClick={(e) => { navigate("/update", { state: { from: "profile", to: "/profile" } }) }} className="w-full rounded-2xl bg-primary text-white px-4 py-2 hover:scale-105 hover:shadow-md transition-transform duration-300 ease-in-out">
                         Update</button>
                 </div>
@@ -101,17 +116,23 @@ export default function Profile() {
                     <p>Logged in as {userName} ({userEmail})</p>
 
                     <div className="flex justify-center gap-2 mt-5">
-                        <label className="border cursor-pointer rounded-xl bg-primary text-white px-4 py-2 hover:shadow-md">
+                        <label className={`${chgProfLoad ? "hidden" : ""} border cursor-pointer rounded-xl bg-primary text-white px-4 py-2 hover:shadow-md`}>
                             <input type="file" onChange={(e) => setProfilePic(e)} className="hidden" />
                             {(profile != undefined && profile != '') ? "Update" : "Set"} Profile Picture
                         </label>
+                        <label className={`${chgProfLoad ? "" : "hidden"} border cursor-pointer rounded-xl bg-primary text-white px-4 py-2 hover:shadow-md animate-pulse`}>
+                            {(profile != undefined && profile != '') ? "Updating" : "Setting"} Profile Picture...
+                        </label>
                         {(profile != undefined && profile != '') &&
-                            <label className="border cursor-pointer rounded-xl bg-primary text-white px-4 py-2 hover:shadow-md">
-                                <button onClick={(e) => removeProfilePic(e)} className="hidden" />
-                                Remove Profile Picture
-                            </label>
+                            <>
+                                <label className={`${remProfLoad ? "hidden" : ""}  border cursor-pointer rounded-xl bg-primary text-white px-4 py-2 hover:shadow-md`}>
+                                    <button onClick={(e) => removeProfilePic(e)} className="hidden" />
+                                    Remove Profile Picture
+                                </label>
+                                <label className={`${remProfLoad ? "" : "hidden"} border cursor-pointer rounded-xl bg-primary text-white px-4 py-2 hover:shadow-md animate-pulse`}>Removing profile picture...</label>
+                            </>
                         }
-                        <Link to="/profile/changePassword" state={{status:"loggedIn"}} className="border cursor-pointer rounded-xl bg-primary text-white px-4 py-2 hover:shadow-md">
+                        <Link to="/profile/changePassword" state={{ status: "loggedIn" }} className="border cursor-pointer rounded-xl bg-primary text-white px-4 py-2 hover:shadow-md">
                             Change Password
                         </Link>
                     </div>

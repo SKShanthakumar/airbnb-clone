@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import FormPhotos from "./FormPhotos";
 import FormPerks from "./FormPerks";
 import FormAddress from "./FormAddress";
+import EditPlaceSkeleton from "../skeletons/EditPlaceSkeleton";
 
 export default function AddPlace() {
     const navigate = useNavigate();
@@ -20,6 +21,9 @@ export default function AddPlace() {
     const [checkOut, setCheckOut] = useState('');
     const [maxGuests, setMaxGuests] = useState('');
     const [price, setPrice] = useState('');
+
+    const [loading, setLoading] = useState(false);
+    const [saveLoading, setSaveLoading] = useState(false);
 
     useEffect(() => {
         if (!id) {
@@ -40,30 +44,37 @@ export default function AddPlace() {
                 setCheckOut(data.checkOut);
                 setMaxGuests(data.maxGuests);
                 setPrice(data.price);
+                setLoading(false);
             } catch (e) {
                 if (e.response.status >= 400) {
                     alert(e.response.data.message);
                 }
+                setLoading(false);
             }
         }
+        setLoading(true);
         fetchData();
     }, []);
 
     async function SavePlace(e) {
         e.preventDefault();
+        setSaveLoading(true);
 
         if (!title || !address.street || !address.locality || !address.city || !address.pincode || !address.country || !photos || !description || !checkIn || !checkOut || !maxGuests || !price) {
             alert("Fill all the mandatory fields");
+            setSaveLoading(false);
             return;
         }
 
         if (checkIn > 24 || checkIn < 0 || checkOut < 0 || checkOut > 24 || checkIn <= checkOut) {
             alert("Enter valid checkin & checkout time");
+            setSaveLoading(false);
             return;
         }
 
         if (photos.length < 5) {
             alert("Upload minimum 5 photos");
+            setSaveLoading(false);
             return;
         }
 
@@ -93,20 +104,24 @@ export default function AddPlace() {
                     setCheckOut('');
                     setMaxGuests('');
                     setPrice('');
-
-                    alert("Accomodation added successfully");
                 }
                 else
                     alert(res.data.message);
             } else {
                 const res = await axios.put(`/place/${id}`, data);
             }
+            setSaveLoading(false);
             navigate("/profile/accommodations");
         } catch (e) {
             if (e.response.status >= 400) {
                 alert(e.response.data.message);
             }
+            setSaveLoading(false);
         }
+    }
+
+    if (loading) {
+        return <EditPlaceSkeleton />
     }
 
     return (
@@ -181,7 +196,8 @@ export default function AddPlace() {
                     </div>
                 </div>
 
-                <div className="text-center"><button type="submit" className="bg-primary text-white w-1/3 py-2 rounded-full my-5">{id ? "Save" : "Add"}</button></div>
+                <div className="text-center"><button type="submit" className={`${saveLoading ? "hidden" : ""} bg-primary text-white w-1/3 py-2 rounded-full my-5`}>{id ? "Save" : "Add"}</button></div>
+                <div className="text-center"><button type="submit" className={`${saveLoading ? "" : "hidden"} bg-primary text-white w-1/3 py-2 rounded-full my-5 animate-pulse`}>{id ? "Saving" : "Adding"}...</button></div>
             </form>
         </div>
     )

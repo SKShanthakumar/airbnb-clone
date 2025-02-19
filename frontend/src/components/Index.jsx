@@ -27,6 +27,7 @@ function Index() {
                 if (e.response.status >= 400) {
                     alert(e.response.data.message);
                 }
+                setLoading(false);
             }
         }
         fetchData();
@@ -34,6 +35,10 @@ function Index() {
 
     async function updateFav(e, id) {
         try {
+            setFav((prevFav) =>
+                prevFav.includes(id) ? prevFav.filter((favId) => favId !== id) : [...prevFav, id]
+            );
+
             if (!fav?.includes(id)) {
                 const { data } = await axios.post("/user/add-to-favourites", { id });
                 setFav(data.favourites);
@@ -42,7 +47,11 @@ function Index() {
                 setFav(data.favourites);
             }
         } catch (e) {
-            if (e.response.status >= 400) {
+            setFav((prevFav) =>
+                prevFav.includes(id) ? [...prevFav, id] : prevFav.filter((favId) => favId !== id)
+            );
+
+            if (e.response?.status >= 400) {
                 alert(e.response.data.message);
             }
         }

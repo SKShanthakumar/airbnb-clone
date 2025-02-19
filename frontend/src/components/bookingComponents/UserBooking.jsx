@@ -9,6 +9,8 @@ export default function UserBooking() {
     const [pastBookings, setPastBookings] = useState([]);
 
     const [loading, setLoading] = useState(true);
+    const [cancelLoading, setCancelLoading] = useState(false);
+    const [cancelId, setCancelId] = useState("");
 
     useEffect(() => {
         async function fetchData() {
@@ -31,19 +33,26 @@ export default function UserBooking() {
             e.preventDefault();
 
             const isConfirmed = confirm("Do you want to cancel booking?");
+
+
             if (isConfirmed) {
+                setCancelLoading(true);
+                setCancelId(booking._id);
                 await axios.post(`/place/booking/cancel/${booking._id}`)
                 setUserBookings(userBookings.filter(item => item != booking));
-                alert("Booking cancelled")
+                setCancelLoading(false);
+                setCancelId("");
             }
         } catch (e) {
             if (e.response.status == 400) {
                 alert(e.response.data.message);
             }
+            setCancelLoading(false);
+            setCancelId("");
         }
     }
 
-    if(loading){
+    if (loading) {
         return <FetchingSkeleton text={"Fetching your bookings"} />
     }
 
@@ -59,7 +68,13 @@ export default function UserBooking() {
                     <Link key={index}
                         state={{ place: booking.place, booking }}
                         to={`/profile/bookings/${booking._id}   `}
-                        className="flex border rounded-2xl overflow-hidden gap-5 bg-gray-100 w-full">
+                        className="flex relative border rounded-2xl overflow-hidden gap-5 bg-gray-100 w-full">
+
+                        {/* loading overlay */}
+                        {cancelLoading && cancelId == booking._id && (
+                            <div className="absolute w-full h-full rounded-2xl bg-gray-200 z-10 animate-pulse"></div>
+                        )}
+
                         <div className="h-36 w-36 border-e flex-shrink-0">
                             <img
                                 className="aspect-square object-cover"

@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { UserContext } from "../userContext";
+import UpdateSkeleton from "./skeletons/UpdateSkeleton";
 
 function Register() {
     const [user, setUser] = useState({
@@ -10,6 +11,12 @@ function Register() {
         password: "",
         language: []
     });
+
+    const [regLoading, setRegLoading] = useState(false);
+    const [otpLoading, setOtpLoading] = useState(false);
+    const [verifyLoading, setVerifyLoading] = useState(false);
+    const [updateLoading, setUpdateLoading] = useState(false);
+
     const [lang, setLang] = useState('');
     const [checkPass, setCheckPass] = useState('');
     const [otp, setOtp] = useState("");
@@ -29,20 +36,22 @@ function Register() {
             if (location.pathname == "/update") {
                 async function fetchData() {
                     const { data } = await axios.get("/user/current");
-                    console.log(data)
                     setUser({
                         name: data.name,
                         email: data.email,
                         password: "",
                         language: data.language
                     })
+                    setUpdateLoading(false);
                 }
+                setUpdateLoading(true);
                 fetchData();
             }
         } catch (e) {
             if (e.response.status >= 400) {
                 alert(e.response.data.message);
             }
+            setUpdateLoading(false);
         }
     }, [])
 
@@ -63,30 +72,36 @@ function Register() {
 
     async function sendOtp(e) {
         e.preventDefault();
+        setOtpLoading(true);
         try {
             const { data } = await axios.post("/user/send-otp", { email: user.email });
             setOtpSent(true);
-            alert(data.message);
+            setOtpLoading(false);
         } catch (e) {
             alert(e.response.data.message);
+            setOtpLoading(false);
         }
     }
 
     async function verifyOtp(e) {
         e.preventDefault();
+        setVerifyLoading(true);
         try {
-            const { data } = await axios.post("/user/verify-otp", { email: user.email, otp });
-            alert(data.message);
+            await axios.post("/user/verify-otp", { email: user.email, otp });
             setOtpVerified(true);
+            setVerifyLoading(false);
         } catch (e) {
             alert(e.response.data.message);
+            setVerifyLoading(false);
         }
     }
 
     async function addUser(e) {
         e.preventDefault();
+        setRegLoading(true);
         if (user.name === "" || (from == "" && user.email === "") || (from == "" && user.password === "") || user.language == [] || user.name.trim().length == 0 || (from == "" && user.email.trim().length == 0) || (from == "" && user.password.trim().length == 0)) {
             alert("All fields are mandatory");
+            setRegLoading(false);
             return;
         }
 
@@ -94,21 +109,22 @@ function Register() {
             if (from == "") {
                 if (user.password != checkPass) {
                     alert("Passwords do not match");
+                    setRegLoading(false);
                     return;
                 }
 
                 if (!otpVerified) {
                     alert("verify your email using OTP");
+                    setRegLoading(false);
                     return
                 }
 
                 await axios.post('/user/register', {
-                    name: user.name,    
+                    name: user.name,
                     email: user.email,
                     password: user.password,
                     language: user.language
                 });
-                alert("Registration Successful");
             } else {
                 const { data } = await axios.put('/user/update', {
                     name: user.name,
@@ -116,7 +132,6 @@ function Register() {
                 });
 
                 updateUserContext(data.name, data.email)
-                alert("Update Successful");
             }
             setUser({
                 name: "",
@@ -128,6 +143,7 @@ function Register() {
             setOtp("");
             setOtpSent(false);
             setOtpVerified(false);
+            setRegLoading(false);
             navigate(to);
         } catch (e) {
             if (e.response.status === 400)
@@ -144,7 +160,12 @@ function Register() {
             setOtp("");
             setOtpSent(false);
             setOtpVerified(false);
+            setRegLoading(false);
         }
+    }
+
+    if (updateLoading) {
+        return <UpdateSkeleton />
     }
 
     return (
@@ -170,36 +191,42 @@ function Register() {
                                 value={user.email}
                                 onChange={(e) => { setUser({ ...user, email: e.target.value }) }}
                             />
-                            <button onClick={(e) => { sendOtp(e) }} className="border bg-primary text-white rounded-2xl p-1 h-full">Send OTP</button>
+                            <button onClick={(e) => { sendOtp(e) }} className={`${otpLoading ? "hidden" : ""} border bg-primary text-white rounded-2xl p-1 h-full`}>Send OTP</button>
+                            <div className={`${otpLoading ? "" : "hidden"} border bg-primary text-white rounded-2xl p-1 pt-2 h-full items-center text-center animate-pulse cursor-pointer`}>Sending...</div>
                         </div>
-                    </>
-                )}
-                {(from == "" && otpSent && !otpVerified) && (
-                    <>
-                        <div className="grid grid-cols-3 gap-1 mt-2">
-                            <input type="string"
-                                placeholder="enter OTP"
-                                className="border rounded-2xl py-2 px-3 col-span-2 max-h-fit"
-                                value={otp}
-                                onChange={(e) => { setOtp(e.target.value) }}
-                            />
-                            <button onClick={(e) => { verifyOtp(e) }} className="border bg-primary text-white rounded-2xl p-1 h-full">Verify OTP</button>
-                        </div>
-                        <p className="text-justify text-gray-400 px-2 mt-2">You would have received an OTP if you have entered a valid email address</p>
-                    </>
-                )}
-                {(from == "" && otpVerified) && (
-                    <div className="flex items-center gap-1 text-green-500 px-2 mt-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                        </svg>
-                        <p>email verified</p>
-                    </div>
 
-                )}
+                        {otpSent && !otpVerified && (
+                            <>
+                                <div className="flex items-center gap-1 text-green-500 px-2 mt-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                    </svg>
+                                    <p>OTP sent</p>
+                                </div>
+                                <div className="grid grid-cols-3 gap-1 mt-2">
+                                    <input type="string"
+                                        placeholder="enter OTP"
+                                        className="border rounded-2xl py-2 px-3 col-span-2 max-h-fit"
+                                        value={otp}
+                                        onChange={(e) => { setOtp(e.target.value) }}
+                                    />
+                                    <button onClick={(e) => { verifyOtp(e) }} className={`${verifyLoading ? "hidden" : ""} border bg-primary text-white rounded-2xl p-1 h-full`}>Verify OTP</button>
+                                    <div className={`${verifyLoading ? "" : "hidden"} border bg-primary text-white rounded-2xl p-1 pt-2 h-full items-center text-center animate-pulse cursor-pointer`}>Verifying...</div>
+                                </div>
+                                <p className="text-justify text-gray-400 px-2 mt-2">You would have received an OTP if you have entered a valid email address</p>
+                            </>
+                        )}
 
-                {from == "" && (
-                    <>
+                        {otpVerified && (
+                            <div className="flex items-center gap-1 text-green-500 px-2 mt-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                                <p>email verified</p>
+                            </div>
+
+                        )}
+
                         <br />
                         <div>
                             <input type="password"
@@ -241,7 +268,8 @@ function Register() {
                     ))}
                 </div>
 
-                <button className="border bg-primary text-white rounded-2xl p-1 mt-5 mb-1">{from == "" ? "Register" : "Update"}</button>
+                <button className={`${regLoading ? "hidden" : ""} border bg-primary text-white rounded-2xl p-1 mt-5 mb-1`}>{from == "" ? "Register" : "Update"}</button>
+                <div className={`${regLoading ? "" : "hidden"} border bg-primary text-white rounded-2xl p-1 mt-5 mb-1 text-center animate-pulse cursor-pointer`}>{from == "" ? "Registering" : "Updating"}...</div>
 
                 {from == "" &&
                     <div className="text-center text-gray-500">

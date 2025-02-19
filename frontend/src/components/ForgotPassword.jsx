@@ -8,25 +8,31 @@ export default function ForgotPassword() {
     const [otpSent, setOtpSent] = useState(false);
     const [otpVerified, setOtpVerified] = useState(false);
 
+    const [loading, setLoading] = useState(false);
+
     async function sendOtp(e) {
         e.preventDefault();
+        setLoading(true);
         try {
-            const { data } = await axios.post("/user/send-otp", { email });
+            await axios.post("/user/send-otp", { email });
             setOtpSent(true);
-            alert(data.message);
+            setLoading(false);
         } catch (e) {
             alert(e.response.data.message);
+            setLoading(false);
         }
     }
 
     async function verifyOtp(e) {
         e.preventDefault();
+        setLoading(true);
         try {
-            const { data } = await axios.post("/user/verify-otp", { email, otp });
-            alert(data.message);
+            await axios.post("/user/verify-otp", { email, otp });
+            setLoading(false);
             setOtpVerified(true);
         } catch (e) {
             alert(e.response.data.message);
+            setLoading(false);
         }
     }
 
@@ -46,7 +52,8 @@ export default function ForgotPassword() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
-                        <button type="submit" onClick={(e) => sendOtp(e)} className="mt-5 border bg-primary text-white rounded-2xl p-1 mb-1 hover:shadow-md">Send OTP</button>
+                        <button type="submit" onClick={(e) => sendOtp(e)} className={`${loading ? "hidden" : ""} mt-5 border bg-primary text-white rounded-2xl p-1 mb-1 hover:shadow-md`}>Send OTP</button>
+                        <div className={`${loading ? "" : "hidden"} mt-5 border text-center bg-primary text-white rounded-2xl p-1 mb-1 animate-pulse`}>Sending OTP...</div>
                     </>
                 )}
                 {otpSent && !otpVerified && (
@@ -58,7 +65,8 @@ export default function ForgotPassword() {
                             value={otp}
                             onChange={(e) => { setOtp(e.target.value) }}
                         />
-                        <button onClick={(e) => { verifyOtp(e) }} className="border bg-primary text-white rounded-2xl p-1 h-full mt-5">Verify OTP</button>
+                        <button onClick={(e) => { verifyOtp(e) }} className={`${loading ? "hidden" : ""} border bg-primary text-white rounded-2xl p-1 mt-5`}>Verify OTP</button>
+                        <div className={`${loading ? "" : "hidden"} mt-5 border text-center bg-primary text-white rounded-2xl p-1 animate-pulse`}>Verifying OTP...</div>
                     </>
                 )}
             </form>

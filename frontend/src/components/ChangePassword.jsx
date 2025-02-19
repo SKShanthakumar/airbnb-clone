@@ -7,6 +7,8 @@ export default function ChangePassword() {
     const [newPass, setNewPass] = useState("");
     const [checkNewPass, setCheckNewPass] = useState("");
 
+    const [loading, setLoading] = useState(false);
+
     const navigate = useNavigate();
     const location = useLocation();
     const status = location.state.status;
@@ -20,15 +22,25 @@ export default function ChangePassword() {
             return;
         }
 
+        if (newPass == curPass) {
+            alert("New password and current password cannot be same");
+            setCurPass("");
+            setNewPass("");
+            setCheckNewPass("");
+            return;
+        }
+
+        setLoading(true);
         if (status == "loggedIn") {
             try {
                 const res = await axios.post("/user/change-pass", { curPass, newPass });
                 navigate("/profile");
-                alert(res.data.message);
+                setLoading(false);
             } catch (e) {
                 setNewPass("");
                 setCheckNewPass("");
                 setCurPass("");
+                setLoading(false);
                 alert(e.response.data.message);
             }
         }
@@ -36,12 +48,12 @@ export default function ChangePassword() {
             try {
                 const res = await axios.post("/user/change-pass-otp-verified", { password: newPass, email: location.state.email });
                 navigate("/login");
-                alert(res.data.message);
-
+                setLoading(false);
             } catch (e) {
                 setNewPass("");
                 setCheckNewPass("");
                 alert(e.response.data.message);
+                setLoading(false);
                 navigate("/forgotPassword")
             }
         }
@@ -76,7 +88,8 @@ export default function ChangePassword() {
                     value={checkNewPass}
                     onChange={(e) => setCheckNewPass(e.target.value)}
                 />
-                <button type="submit" className="border bg-primary text-white rounded-2xl p-1 mt-8 mb-1 hover:shadow-md">Update</button>
+                <button type="submit" className={`${loading ? "hidden" : ""} border bg-primary text-white rounded-2xl p-1 mt-8 mb-1 hover:shadow-md`}>Update</button>
+                <div className={`${loading ? "" : "hidden"} border text-center bg-primary text-white rounded-2xl p-1 mt-8 mb-1 hover:shadow-md animate-pulse`}>Updating...</div>
             </form>
         </div>
     )

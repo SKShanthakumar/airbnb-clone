@@ -12,10 +12,14 @@ function Login({ from = "" , to = "/"}) {
     const { setUserName, setUserEmail, setProfile, setOld, fav, setFav } = useContext(UserContext);
     const navigate = useNavigate();
 
+    const [loading, setLoading] = useState(false);
+
     async function loginUser(e) {
         e.preventDefault();
+        setLoading(true);
         if (user.email === "" || user.password === "") {
             alert("All fields are mandatory");
+            setLoading(false);
             return;
         }
 
@@ -29,11 +33,12 @@ function Login({ from = "" , to = "/"}) {
             setProfile(response.data.profilePic);
             setOld(response.data.old);
             setFav(response.data.favourites);
-            alert("Login Successful");
+            // alert("Login Successful");
             setUser({
                 email: "",
                 password: ""
             });
+            setLoading(false);
             navigate(to);
         } catch (e) {
             alert("Login Failed")
@@ -41,6 +46,7 @@ function Login({ from = "" , to = "/"}) {
                 email: "",
                 password: ""
             });
+            setLoading(false);
         }
     }
 
@@ -64,7 +70,9 @@ function Login({ from = "" , to = "/"}) {
                     Forgot password?
                 </Link>
 
-                <button className="border bg-primary text-white rounded-2xl p-1 mt-5 mb-1 hover:shadow-md">Login</button>
+                <button className={`${loading? "hidden":""} border bg-primary text-white rounded-2xl p-1 mt-5 mb-1 hover:shadow-md`}>Login</button>
+                <div className={`${loading? "":"hidden"} border bg-primary text-white rounded-2xl p-1 mt-5 mb-1 text-center animate-pulse cursor-pointer`}>Logging in...</div>
+
                 <div className="text-center text-gray-500">
                     Don't have an account? <Link to="/register" className="text-black underline">Register</Link>
                 </div>

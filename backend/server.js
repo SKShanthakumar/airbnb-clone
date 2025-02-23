@@ -9,6 +9,7 @@ import cookieParser from 'cookie-parser';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { loadTrie } from './controllers/placeController.js';
+import { processImages } from './config/awsConfig.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -35,4 +36,5 @@ app.listen(port, () => {
     console.log(`Server is listening on port ${port}`);
     connectDb();
     loadTrie();
+    processImages();
 });

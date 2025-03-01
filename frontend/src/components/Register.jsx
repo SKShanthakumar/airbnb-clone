@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from 'axios';
-import { UserContext } from "../userContext";
+import { UserContext } from "../UserContext";
 import UpdateSkeleton from "./skeletons/UpdateSkeleton";
 
 function Register() {

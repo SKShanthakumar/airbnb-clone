@@ -55,7 +55,7 @@ function Header() {
                     </div>
 
                     {/* search bar for small screens */}
-                    <div className="relative overflow-hidden flex w-full mx-10 justify-between md:hidden items-center gap-4 shadow shadow-gray-200 border border-gray-300 rounded-full py-2 ps-6 hover:shadow-md">
+                    <div className="relative overflow-hidden flex w-full mx-4 justify-between md:hidden items-center gap-4 shadow shadow-gray-200 border border-gray-300 rounded-full py-2 ps-6 hover:shadow-md">
                         <i className="bx bx-search absolute left-4 text-lg"></i>
                         <input className="focus:outline-none placeholder-black"
                             placeholder="    Start your search"

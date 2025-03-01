@@ -51,7 +51,8 @@ function Login({ from = "" , to = "/"}) {
     }
 
     return (
-        <div className={`border rounded-xl p-7 mx-auto ${from == "" ? "mt-20 shadow-md w-96" : "mt-10 shadow-xl w-full"} max-h-fit min-w-80`}>
+        <div className="flex justify-around">
+        <div className={`border rounded-xl p-7 ${from == "" ? "mt-20 shadow-md w-full sm:w-96 mx-6" : "mt-10 shadow-xl w-full"} max-h-fit min-w-80`}>
             <h1 className="text-3xl text-center ">{from == "" ? "Login" : "Login to Book"}</h1>
             <form className="flex flex-col mt-7" onSubmit={(e) => loginUser(e)}>
                 <input type="email"
@@ -77,6 +78,7 @@ function Login({ from = "" , to = "/"}) {
                     Don't have an account? <Link to="/register" className="text-black underline">Register</Link>
                 </div>
             </form>
+        </div>
         </div>
     );
 }

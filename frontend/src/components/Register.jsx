@@ -169,7 +169,8 @@ function Register() {
     }
 
     return (
-        <div className="w-96 border rounded-xl p-7 shadow-md mx-auto mt-20 max-h-fit min-w-80">
+        <div className="flex justify-around">
+        <div className="w-96 border rounded-xl p-7 shadow-md mx-6 mt-20 max-h-fit min-w-80">
             <h1 className="text-3xl text-center">{from == "" ? "Register" : "Update"}</h1>
             <form className="flex flex-col mt-7" onSubmit={(e) => addUser(e)}>
 
@@ -277,6 +278,7 @@ function Register() {
                     </div>
                 }
             </form>
+        </div>
         </div>
     );
 }

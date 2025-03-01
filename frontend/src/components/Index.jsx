@@ -2,7 +2,7 @@ import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { UserContext } from "../UserContext";
-import IndexSkeleton from "./skeletons/indexSkeleton";
+import IndexSkeleton from "./skeletons/IndexSkeleton";
 
 function Index() {
     const [places, setPlaces] = useState([]);

@@ -51,6 +51,7 @@ export default function BookingWidget({ place, owner }) {
             const res = await axios.post("/place/book", data);
             setLoading(false);
             if (res) {
+                alert("Booking confirmed! check your mail for further details")
                 navigate("/profile/bookings");
             } else {
                 alert("Error in booking");

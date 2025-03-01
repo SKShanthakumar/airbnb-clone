@@ -14,7 +14,7 @@ import UserBooking from './components/bookingComponents/UserBooking';
 import BookingPage from './components/bookingComponents/BookingPage';
 import Favourites from './components/Favourites';
 import PastBooking from './components/bookingComponents/PastBooking';
-import ChangePassword from './components/changePassword';
+import ChangePassword from './components/ChangePassword';
 import ForgotPassword from './components/ForgotPassword';
 import EditPlaceSkeleton from './components/skeletons/EditPlaceSkeleton';
 

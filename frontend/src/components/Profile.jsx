@@ -83,7 +83,7 @@ export default function Profile() {
     return (
         <div className="container mx-auto xl:w-4/6 mt-10 px-5 flex flex-col items-center md:items-start md:flex-row gap-20">
 
-            <div className="w-96 md:max-w-80 rounded-2xl py-10 px-10 flex flex-col items-center" style={{ boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.2)' }}>
+            <div className="w-full md:max-w-80 rounded-2xl py-10 px-10 flex flex-col items-center" style={{ boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.2)' }}>
                 {(profile != undefined && profile != '') &&
                     <div className="w-52 rounded-full overflow-hidden">
                         <img src={`${import.meta.env.VITE_API_DOMAIN}/profile/${profile}`}
@@ -115,7 +115,7 @@ export default function Profile() {
                 <div className="text-center border w-full rounded-xl mx-auto p-5">
                     <p>Logged in as {userName} ({userEmail})</p>
 
-                    <div className="flex justify-center gap-2 mt-5">
+                    <div className="flex flex-col lg:flex-row justify-center gap-2 mt-5">
                         <label className={`${chgProfLoad ? "hidden" : ""} border cursor-pointer rounded-xl bg-primary text-white px-4 py-2 hover:shadow-md`}>
                             <input type="file" onChange={(e) => setProfilePic(e)} className="hidden" />
                             {(profile != undefined && profile != '') ? "Update" : "Set"} Profile Picture
@@ -132,7 +132,7 @@ export default function Profile() {
                                 <label className={`${remProfLoad ? "" : "hidden"} border cursor-pointer rounded-xl bg-primary text-white px-4 py-2 hover:shadow-md animate-pulse`}>Removing profile picture...</label>
                             </>
                         }
-                        <Link to="/profile/changePassword" state={{ status: "loggedIn" }} className="border cursor-pointer rounded-xl bg-primary text-white px-4 py-2 hover:shadow-md">
+                        <Link to="/profile/changePassword" state={{ status: "loggedIn" }} className="flex justify-around items-center border cursor-pointer rounded-xl bg-primary text-white px-4 py-2 hover:shadow-md">
                             Change Password
                         </Link>
                     </div>

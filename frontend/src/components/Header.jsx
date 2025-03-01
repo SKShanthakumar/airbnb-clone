@@ -42,7 +42,7 @@ function Header() {
                     <div onClick={(e) => { setIsSearchFocused(true); setTimeout(() => { inputRef.current.focus() }, 100); }}
                         className={`hidden md:flex relative  items-center gap-4 shadow shadow-gray-200 border border-gray-300 rounded-full py-2 ps-6 pe-2 hover:shadow-md cursor-pointer ${isSearchFocused ? "md:hidden" : "md:flex"} transition-all duration-300 ease-in-out`}>
 
-                        <div className="font-semibold w-[72px] overflow-hidden">{searchQuery.trim() == "" ? "Anywhere" : searchQuery}</div>
+                        <div className="font-semibold w-[82px] overflow-hidden">{searchQuery.trim() == "" ? "Anywhere" : searchQuery}</div>
                         <div className="border-l border-gray-300 h-6"></div>
                         <div className="font-semibold">Any week</div>
                         <div className="border-l border-gray-300 h-6"></div>
@@ -55,17 +55,13 @@ function Header() {
                     </div>
 
                     {/* search bar for small screens */}
-                    <div className="flex w-full mx-10 justify-between md:hidden items-center gap-4 shadow shadow-gray-200 border border-gray-300 rounded-full py-2 ps-6 pe-2 hover:shadow-md">
+                    <div className="relative overflow-hidden flex w-full mx-10 justify-between md:hidden items-center gap-4 shadow shadow-gray-200 border border-gray-300 rounded-full py-2 ps-6 hover:shadow-md">
+                        <i className="bx bx-search absolute left-4 text-lg"></i>
                         <input className="focus:outline-none placeholder-black"
-                            placeholder="Start your search"
+                            placeholder="    Start your search"
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)} />
-                        <button className="border bg-primary text-white p-2 border-gray-300 rounded-full" type="submit">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-4">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
-                            </svg>
-                        </button>
                     </div>
 
                     <Link to={userName ? "/profile" : "/login"}>

@@ -1,6 +1,6 @@
 import { useContext, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { UserContext } from "../userContext";
+import { UserContext } from "../UserContext";
 
 function Header() {
     const { userName, profile, searchQuery, setSearchQuery, guestCount, setGuestCount } = useContext(UserContext);

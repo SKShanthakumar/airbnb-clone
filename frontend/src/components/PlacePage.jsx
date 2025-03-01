@@ -3,7 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { perkIconsMap, perkTextMap } from "./formComponents/perkMaps";
 import BookingWidget from "./bookingComponents/BookingWidget";
-import { UserContext } from "../userContext";
+import { UserContext } from "../UserContext";
 import Login from "./Login";
 import PhotosGrid from "./galleryComponents/PhotosGrid";
 import Gallery from "./galleryComponents/Gallery";

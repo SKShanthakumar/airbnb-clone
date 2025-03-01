@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import axios from "axios";
-import { UserContext } from "../userContext";
+import { UserContext } from "../UserContext";
 import FetchingSkeleton from "./skeletons/FetchingSkeleton";
 
 export default function Favourites() {

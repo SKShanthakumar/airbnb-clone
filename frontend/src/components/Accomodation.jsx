@@ -72,7 +72,7 @@ export default function Accommodation() {
                                     <div className="h-32 w-32 border-e flex-shrink-0">
                                         <img
                                             className="aspect-square object-cover"
-                                            src={`${import.meta.env.VITE_API_DOMAIN}/uploads/${place.photos[0]}`}
+                                            src={place.photos[0]}
                                             alt={place.photos[0]}
                                         />
                                     </div>

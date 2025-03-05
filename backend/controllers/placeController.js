@@ -33,72 +33,6 @@ async function loadTrie() {
     }
 };
 
-
-
-// @desc Upload photos using link
-// @route POST /api/place/photo/upload-by-link
-// @access private
-const uploadByLink = asyncHandler(async (req, res) => {
-    const { link } = req.body;
-    const extension = extname(link); // Preserve the original extension
-    const newName = `${req.user.name}-${Date.now()}${extension}`;
-    const filePath = join(__dirname, 'uploads/temp', newName);
-    const compressName = `${req.user.name}-compress-${Date.now()}${extension}`;
-    const filePathCompress = join(__dirname, 'uploads/placePhotos', compressName);
-
-    try {
-        await imageDownloader.image({
-            url: link,
-            dest: filePath,
-        });
-
-        // Compress the image (keep the original format)
-        await sharp(filePath)
-            .resize(800) // Resize to max width of 800px
-            .toFile(filePathCompress); // Overwrite the file with the compressed version
-
-        res.status(200).json({ fileName: compressName });
-    } catch (e) {
-        res.status(404);
-        throw new Error('Invalid link or compression error' + e);
-    }
-});
-
-// @desc Upload photos from device
-// @route POST /api/place/photo/upload-from-device
-// @access private
-const uploadFromDevice = asyncHandler(async (req, res) => {
-    if (!req.files || req.files.length === 0) {
-        res.status(400);
-        throw new Error('No files uploaded');
-    }
-
-    const fileNames = [];
-
-    for (const file of req.files) {
-        const originalFilePath = resolve('uploads/temp', file.filename);
-        const compressedFileName = req.user.name + '-compress-' + Date.now() + extname(file.originalname);
-        const compressedFilePath = resolve('uploads/placePhotos', compressedFileName);
-
-        try {
-            // Compress the image using sharp
-            await sharp(originalFilePath)
-                .resize(800) // Resize to a max width of 800px (or adjust as needed)
-                .toFile(compressedFilePath); // Save the compressed version
-
-            // Add compressed filename to response array
-            fileNames.push(compressedFileName);
-        } catch (error) {
-            console.error('Error processing image:', error);
-            res.status(500);
-            throw new Error('Error processing image');
-        }
-    }
-
-    // Send the filenames as response
-    res.json({ fileNames });
-});
-
 // @desc Add an accommodation
 // @route POST /api/place/add
 // @access private
@@ -504,4 +438,4 @@ const searchByName = asyncHandler(async (req, res) => {
     res.json(places);
 })
 
-export { uploadByLink, uploadFromDevice, addAccommodation, updateAccommodation, deleteAccommodation, rateAccommodation, getPlaceRatings, getMyAccommodations, bookAccommodation, cancelBooking, getMyBookings, getAccommodationById, getAccommodations, loadTrie, searchByName }
+export { addAccommodation, updateAccommodation, deleteAccommodation, rateAccommodation, getPlaceRatings, getMyAccommodations, bookAccommodation, cancelBooking, getMyBookings, getAccommodationById, getAccommodations, loadTrie, searchByName }

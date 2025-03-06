@@ -2,17 +2,10 @@ import asyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-import fs from 'fs';       // for deleting files from storage
 import dotenv from 'dotenv';
-import sharp from "sharp"; // for img compression
 import NodeCache from 'node-cache';
 import transporter from "../config/nodeMailerConfig.js"; // for node mailer
 dotenv.config();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(dirname(__filename));
 
 const otpCache = new NodeCache({ stdTTL: 300, checkperiod: 60 }) // OTPs expire after 5 minutes
 

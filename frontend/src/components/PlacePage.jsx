@@ -9,6 +9,8 @@ import PhotosGrid from "./galleryComponents/PhotosGrid";
 import Gallery from "./galleryComponents/Gallery";
 import GmapEmbed from "./GmapEmbed";
 import PlacePageSkeleton from "./skeletons/PlacePageSkeleton";
+import { storage } from "../../firebaseConfig";
+import { ref, deleteObject } from "firebase/storage";
 
 export default function PlacePage() {
     const { id } = useParams();
@@ -46,7 +48,18 @@ export default function PlacePage() {
 
             const isConfirmed = confirm("Do you want to delete?");
             if (isConfirmed) {
-                await axios.post(`/place/delete/${place._id}`);
+                const res = await axios.post(`/place/delete/${place._id}`);
+
+                const photos = res.data.photos;
+                for (const url of photos) {
+                    // Extract the file path from the URL
+                    const filePath = url.split("/o/")[1].split("?")[0];
+                    const decodedPath = decodeURIComponent(filePath);
+
+                    const storageRef = ref(storage, decodedPath);
+                    await deleteObject(storageRef);
+                }
+
                 alert("Accommodation deleted");
                 navigate("/profile/accommodations");
             }

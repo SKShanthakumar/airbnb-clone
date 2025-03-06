@@ -179,29 +179,34 @@ export default function PlacePage() {
                         </div>
                     </div>
                     <hr></hr>
-                    <div className="my-4">
-                        <h2 className="text-xl font-semibold">What this place offers</h2>
-                        <div className="grid grid-cols-2">
-                            {place.perks?.length > 0 && place.perks.map(perk => (
-                                <div key={perk} className="flex gap-2 mt-4">
-                                    {perkIconsMap[perk]}
-                                    {perkTextMap[perk]}
+                    {place.perks.length > 0 &&
+                        <div>
+                            <div className="my-4">
+                                <h2 className="text-xl font-semibold">What this place offers</h2>
+                                <div className="grid grid-cols-2">
+                                    {place.perks?.length > 0 && place.perks.map(perk => (
+                                        <div key={perk} className="flex gap-2 mt-4">
+                                            {perkIconsMap[perk]}
+                                            {perkTextMap[perk]}
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
+                            </div>
+                            <hr></hr>
                         </div>
-                    </div>
+                    }
 
-                    <hr></hr>
                     <div className="mt-4 mb-10">
-
                         <p><span className="font-semibold">Check-in:</span> {place.checkIn}:00</p>
                         <p><span className="font-semibold">Check-out:</span> {place.checkOut}:00</p>
                         <p><span className="font-semibold">Max number of guests:</span> {place.maxGuests}</p>
                     </div>
-                    <div className="bg-gray-100 px-8 py-5 lg:mt-3">
-                        <p className="text-xl font-semibold">Extra info</p>
-                        <p className="text-justify">{place.extraInfo}</p>
-                    </div>
+                    {place.extraInfo.trim() != "" &&
+                        <div className="bg-gray-100 px-8 py-5 lg:mt-3">
+                            <p className="text-xl font-semibold">Extra info</p>
+                            <p className="text-justify">{place.extraInfo}</p>
+                        </div>
+                    }
                 </div>
                 {/* text content ends */}
 

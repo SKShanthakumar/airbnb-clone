@@ -2,9 +2,10 @@ import { useState } from "react";
 import { storage } from "../../../firebaseConfig";
 import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
 import { useEffect } from "react";
+import UploadSkeleton from "../skeletons/UploadSkeleton";
 
 export default function FormPhotos({ photos, setPhotos, photoLink, setPhotoLink }) {
-
+    const [loading, setLoading] = useState(false);
     const [uploads, setUploads] = useState([...photos]);
     const [links, setLinks] = useState([]);
 
@@ -25,7 +26,7 @@ export default function FormPhotos({ photos, setPhotos, photoLink, setPhotoLink 
     async function uploadFromDevice(e) {
         const selectedFiles = e.target.files;
         if (selectedFiles.length === 0) return;
-
+        setLoading(true);
         const uploadPromises = Array.from(selectedFiles).map(async (file) => {
             const storageRef = ref(storage, `placePhotos/${file.name}`);
             const snapshot = await uploadBytesResumable(storageRef, file);
@@ -35,10 +36,12 @@ export default function FormPhotos({ photos, setPhotos, photoLink, setPhotoLink 
         try {
             const uploadedUrls = await Promise.all(uploadPromises);
             setUploads([...uploads, ...uploadedUrls]);
+            setLoading(false);
         } catch (e) {
             if (e.response.status >= 400) {
                 alert(e.response.data.message);
             }
+            setLoading(false);
         }
     }
 
@@ -80,8 +83,8 @@ export default function FormPhotos({ photos, setPhotos, photoLink, setPhotoLink 
             </div>
             <div className="mt-2 flex gap-2 flex-wrap">
                 {photos.length > 0 &&
-                    photos.map((item) => (
-                        <div key={item} className="flex relative">
+                    photos.map((item, index) => (
+                        <div key={index} className="flex relative">
                             <img src={item} className="rounded-2xl h-32" />
                             <button onClick={(e) => removePhoto(e, item)} className="absolute bottom-0 right-0 text-white bg-black opacity-50 rounded-xl p-2 m-1">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-5">
@@ -103,16 +106,20 @@ export default function FormPhotos({ photos, setPhotos, photoLink, setPhotoLink 
                         </div>
                     ))
                 }
-                <label className="flex gap-1 justify-center p-5 items-center border rounded-2xl text-lg h-32 cursor-pointer">
-                    <input type="file"
-                        multiple
-                        onChange={(e) => uploadFromDevice(e)}
-                        className="hidden" />
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z" />
-                    </svg>
-                    Upload from device
-                </label>
+                {!loading ?
+                    <label className="flex gap-1 justify-center p-5 items-center border rounded-2xl text-lg h-32 cursor-pointer">
+                        <input type="file"
+                            multiple
+                            onChange={(e) => uploadFromDevice(e)}
+                            className="hidden" />
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z" />
+                        </svg>
+                        Upload from device
+                    </label>
+                    :
+                    <UploadSkeleton />
+                }
             </div>
         </div>
     );

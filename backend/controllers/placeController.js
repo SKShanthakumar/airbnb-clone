@@ -2,21 +2,13 @@ import asyncHandler from "express-async-handler";
 import dotenv from 'dotenv';
 import Place from '../models/placeModel.js'
 import User from "../models/userModel.js";
-import { fileURLToPath } from 'url';
-import { dirname, extname, join, resolve } from 'path';
-import imageDownloader from 'image-downloader';
 import Booking from "../models/bookingModel.js";
-import fs from 'fs';       // for deleting files from storage
-import sharp from "sharp"; // for img compression
 import Trie from "../dsa/trie.js";
 import mergeInterval from "../dsa/mergeInterval.js";
 import transporter from "../config/nodeMailerConfig.js";
 import { format } from "date-fns";
 
 dotenv.config();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(dirname(__filename));
 
 // search trie initialization
 const trie = new Trie();
@@ -32,6 +24,18 @@ async function loadTrie() {
         console.error('Error loading places to Trie:', error);
     }
 };
+
+// to filter out photos added by link and from device
+// photos uploaded from device would be stored in firebase, this function is used to filter those photos and delete in firebase as well
+function getFirebaseLinks(photos){
+    let res = [];
+    photos.forEach((url) => {
+        const list = url.split("/");
+        if(list[2] == "firebasestorage.googleapis.com")
+            res.push(url);
+    });
+    return res
+}
 
 // @desc Add an accommodation
 // @route POST /api/place/add
@@ -84,7 +88,7 @@ const updateAccommodation = asyncHandler(async (req, res) => {
     const oldName = data.address.city;
 
     const updated = await Place.findByIdAndUpdate(req.params.id, req.body, { new: true });
-
+    getFirebaseLinks(updated.photos);
     // trie updataion
     const newName = updated.address.city;
     if (oldName !== newName) {
@@ -108,7 +112,7 @@ const deleteAccommodation = asyncHandler(async (req, res) => {
         throw new Error("User not authorized to delete this place")
     }
 
-    const photos = data.photos;
+    const firebasePhotos = getFirebaseLinks(data.photos);
 
     const deleted = await Place.findByIdAndDelete(req.params.id);
     if (!deleted) {
@@ -118,20 +122,9 @@ const deleteAccommodation = asyncHandler(async (req, res) => {
 
     trie.delete(data.address.city, data.id);  // Delete place from the Trie
 
-    // For deleting files locally
-    photos.forEach((photo) => {
-        const filePath = join(__dirname, "uploads", "placePhotos", photo); // Adjust the path to your uploads directory
-        fs.unlink(filePath, (err) => {
-            if (err && err.code !== "ENOENT") {
-                // Log error if it's not a "file not found" error
-                throw new Error(`Failed to delete file: ${filePath}, err`);
-            }
-        });
-    });
-
     res.status(200).json({
         message: "Accommodation deleted successfully",
-        deleted,
+        photos: firebasePhotos,
     });
 });
 

@@ -22,6 +22,13 @@ export default function ChangePassword() {
             return;
         }
 
+        if (newPass.trim().length < 8) {
+            alert("Password should be atleast 8 characters long");
+            setNewPass("");
+            setCheckNewPass("");
+            return;
+        }
+
         if (newPass == curPass) {
             alert("New password and current password cannot be same");
             setCurPass("");

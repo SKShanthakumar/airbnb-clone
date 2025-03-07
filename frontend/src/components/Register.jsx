@@ -113,6 +113,12 @@ function Register() {
                     return;
                 }
 
+                if (user.password.trim().length < 8) {
+                    alert("Password should be atleast 8 characters long");
+                    setRegLoading(false);
+                    return;
+                }
+
                 if (!otpVerified) {
                     alert("verify your email using OTP");
                     setRegLoading(false);

@@ -30,11 +30,13 @@ export default function PastBooking() {
 
                             {/* image */}
                             <div className="h-36 w-36 border-e flex-shrink-0">
-                                <img
-                                    className="aspect-square object-cover"
-                                    src={booking.place.photos[0]}
-                                    alt={booking.title}
-                                />
+                                <div className="relative w-full aspect-square" >
+                                    <img
+                                        className="absolute top-0 left-0 w-full h-full rounded-xl object-cover"
+                                        src={booking.place.photos[0]}
+                                        alt={booking.title}
+                                    />
+                                </div>
                             </div>
 
                             <div className="flex grow flex-col justify-between my-2 me-5">

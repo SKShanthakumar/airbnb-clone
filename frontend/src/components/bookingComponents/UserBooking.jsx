@@ -75,9 +75,9 @@ export default function UserBooking() {
                             <div className="absolute w-full h-full rounded-2xl bg-gray-200 z-10 animate-pulse"></div>
                         )}
 
-                        <div className="h-36 w-36 border-e flex-shrink-0">
+                        <div className="aspect-square relative h-36 w-36 border-e flex-shrink-0">
                             <img
-                                className="aspect-square object-cover"
+                                className="absolute top-0 left-0 w-full h-full object-cover"
                                 src={booking.place.photos[0]}
                                 alt={booking.title}
                             />

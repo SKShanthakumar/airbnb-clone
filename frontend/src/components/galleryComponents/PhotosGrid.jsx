@@ -6,39 +6,47 @@ export default function PhotosGrid({ photos, toggle }) {
                 <div className="w-full mx-auto my-5 relative">
                     {/* For medium and large screens */}
                     <div className="hidden md:grid md:grid-cols-2 md:gap-2 rounded-2xl overflow-hidden">
-                        <div>
+                        <div className="relative aspect-square">
                             <img
                                 onClick={(e) => toggle(true)}
-                                className="aspect-square object-cover cursor-pointer"
+                                className="absolute top-0 left-0 w-full h-full object-cover cursor-pointer"
                                 src={photos[0]}
                                 alt={photos[0]}
                             />
                         </div>
                         <div className="grid grid-cols-2 gap-2">
+                            <div className="relative aspect-square">
                             <img
                                 onClick={(e) => toggle(true)}
-                                className="aspect-square object-cover cursor-pointer"
+                                className="absolute top-0 left-0 w-full h-full object-cover cursor-pointer"
                                 src={photos[1]}
                                 alt={photos[1]}
                             />
+                            </div>
+                            <div className="relative aspect-square">
                             <img
                                 onClick={(e) => toggle(true)}
-                                className="aspect-square object-cover cursor-pointer"
+                                className="absolute top-0 left-0 w-full h-full object-cover cursor-pointer"
                                 src={photos[2]}
                                 alt={photos[2]}
                             />
+                            </div>
+                            <div className="relative aspect-square">
                             <img
                                 onClick={(e) => toggle(true)}
-                                className="aspect-square object-cover cursor-pointer"
+                                className="absolute top-0 left-0 w-full h-full object-cover cursor-pointer"
                                 src={photos[3]}
                                 alt={photos[3]}
                             />
+                            </div>
+                            <div className="relative aspect-square">
                             <img
                                 onClick={(e) => toggle(true)}
-                                className="aspect-square object-cover cursor-pointer"
+                                className="absolute top-0 left-0 w-full h-full object-cover cursor-pointer"
                                 src={photos[4]}
                                 alt={photos[4]}
                             />
+                            </div>
                         </div>
                     </div>
 

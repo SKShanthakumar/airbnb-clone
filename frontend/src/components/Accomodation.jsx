@@ -82,9 +82,9 @@ export default function Accommodation() {
                                 )}
 
                                 <Link to={`/place/${place._id}`} className="flex border rounded-2xl my-3 overflow-hidden gap-5 bg-gray-100 w-full">
-                                    <div className="h-32 w-32 border-e flex-shrink-0">
+                                    <div className="relative h-32 w-32 border-e flex-shrink-0 aspect-square">
                                         <img
-                                            className="aspect-square object-cover"
+                                            className="absolute top-0 left-0 w-full h-full object-cover"
                                             src={place.photos[0]}
                                             alt={place.photos[0]}
                                         />

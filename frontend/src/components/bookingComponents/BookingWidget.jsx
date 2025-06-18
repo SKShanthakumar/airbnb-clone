@@ -71,7 +71,7 @@ export default function BookingWidget({ place, owner }) {
     }
 
     return (
-        <div className="shadow-xl rounded-2xl p-5 pt-4 border max-h-fit sticky top-28 mb-8 z-1 max-w-fit mt-8 mx-auto lg:mt-0">
+        <div className="shadow-xl rounded-2xl p-5 pt-4 border self-start sticky top-28 mb-8 z-1 max-w-fit mt-8 mx-auto lg:mt-0">
             <p className="flex items-center font-medium text-2xl mt-1 relative right-1"><i className='bx bx-rupee relative top-0.5'></i>{place.price}<span className="font-normal text-lg">&nbsp;per night</span></p>
             <div className="border rounded-2xl mt-5">
                 <div className="flex flex-col md:flex-row">
@@ -101,7 +101,7 @@ export default function BookingWidget({ place, owner }) {
             <div className={`${loading ? "" : "hidden"} border bg-primary text-white rounded-2xl w-full mt-5 py-2 animate-pulse text-center`}>Booking...</div>
             {numberOfNights > 0 &&
                 <div className="text-center">
-                    <p className="text-gray-500 my-3">You won't be charged yet</p>
+                    <p className="text-gray-500 my-3">You won't be charged</p>
                     <div className="flex justify-between px-1">
                         <p className="flex items-center"><i className='bx bx-rupee'></i>{place.price}<span className="">&nbsp;x {numberOfNights} night{numberOfNights > 1 ? "s" : ""}</span></p>
                         <p className="font-semibold text-lg"><i className='bx bx-rupee relative top-0.5'></i>{place.price * numberOfNights}</p>

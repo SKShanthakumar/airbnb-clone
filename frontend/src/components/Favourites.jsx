@@ -50,11 +50,13 @@ export default function Favourites() {
                 {fullFav.length > 0 && fullFav.map((place, index) => (
                     <div key={index} className="relative rounded-2xl overflow-hidden hover:scale-105 hover:translate-y-[-5px] hover:shadow-md transition-transform duration-300 ease-in-out">
                         <Link to={`/place/${place._id}`}>
+                            <div className="relative w-full aspect-video sm:aspect-square">
                             <img
-                                className="aspect-video sm:aspect-square rounded-xl object-cover"
+                                className="absolute top-0 left-0 w-full h-full rounded-xl object-cover"
                                 src={place.photos[0]}
                                 alt={place.title}
                             />
+                            </div>
                             <div className="p-2">
                                 <h3 className="font-medium ">{place.address.city}, {place.address.country}</h3>
                                 <p className="text-sm text-gray-500">{place.title}</p>

@@ -34,6 +34,7 @@ function Index() {
     }, [searchQuery, guestCount])
 
     async function updateFav(e, id) {
+        const prevFav = fav || [];
         try {
             setFav((prevFav) =>
                 prevFav.includes(id) ? prevFav.filter((favId) => favId !== id) : [...prevFav, id]
@@ -47,9 +48,7 @@ function Index() {
                 setFav(data.favourites);
             }
         } catch (e) {
-            setFav((prevFav) =>
-                prevFav.includes(id) ? [...prevFav, id] : prevFav.filter((favId) => favId !== id)
-            );
+            setFav(prevFav);
 
             if (e.response?.status >= 400) {
                 alert(e.response.data.message);
@@ -66,11 +65,13 @@ function Index() {
                 {places.length > 0 && places.map((place, index) => (
                     <div key={index} className="relative rounded-2xl overflow-hidden hover:scale-105 hover:translate-y-[-5px] hover:shadow-md transition-transform duration-300 ease-in-out">
                         <Link to={`/place/${place._id}`}>
-                            <img
-                                className="aspect-video sm:aspect-square rounded-xl object-cover"
-                                src={place.photos[0]}
-                                alt={place.title}
-                            />
+                            <div className="relative w-full aspect-video sm:aspect-square">
+                                <img
+                                    className="absolute top-0 left-0 w-full h-full rounded-xl object-cover"
+                                    src={place.photos[0]}
+                                    alt={place.title}
+                                />
+                            </div>
                             <div className="p-2">
                                 <div className="flex justify-between items-center">
                                     <h3 className="font-medium ">{place.address.city}, {place.address.country}</h3>
@@ -86,7 +87,7 @@ function Index() {
                                         }
                                     </div>
                                 </div>
-                                <p className="text-sm text-gray-500">{place.title}</p>
+                                <p className="text-sm text-gray-500 whitespace-nowrap overflow-hidden text-ellipsis">{place.title}</p>
                                 <p className="flex font-medium mt-1 relative right-1"><i className='bx bx-rupee text-lg'></i>{place.price}<span className="font-normal">&nbsp;per night</span></p>
                             </div>
                         </Link>

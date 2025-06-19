@@ -1,9 +1,8 @@
 import { useContext, useState } from "react"
 import { UserContext } from "../UserContext"
 import { Link, Navigate, useNavigate } from "react-router-dom"
-import { storage } from "../../firebaseConfig";
-import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
 import axios from "axios";
+import { deleteImageFromSupabase, uploadImageToSupabase } from "../../supabase/supabaseFunctions";
 
 export default function Profile() {
     const [loggedOut, setLoggedOut] = useState(false);
@@ -29,12 +28,16 @@ export default function Profile() {
 
         setchgProf(true);
         try {
-            const storageRef = ref(storage, `profile/${file.name}`);
-            const snapshot = await uploadBytesResumable(storageRef, file);
-            const url = await getDownloadURL(snapshot.ref);
+            const url = await uploadImageToSupabase('profile', file)
+
+            if (url === ''){
+                setchgProf(false);
+                throw new Error("Upload Failed!");
+            }
             const res = await axios.post('/user/set-profile-pic', {
                 profileUrl: url
             });
+
             setProfile(res.data.img);
             setchgProf(false);
 
@@ -51,18 +54,18 @@ export default function Profile() {
         setRemProf(true);
 
         try {
-            // Extract the file path from the URL
-            const filePath = profile.split("/o/")[1].split("?")[0];
-            const decodedPath = decodeURIComponent(filePath);
+            const { data, error } = await deleteImageFromSupabase(profile);
 
-            const storageRef = ref(storage, decodedPath);
-            await deleteObject(storageRef);
-
-            const res = await axios.post('/user/set-profile-pic', {
-                profileUrl: ""
-            });
-            setProfile(res.data.img);
-            setRemProf(false);
+            if (error) {
+                console.error('Error deleting file:', error.message);
+            } else {
+                const res = await axios.post('/user/set-profile-pic', {
+                    profileUrl: ""
+                });
+                setProfile(res.data.img);
+                setRemProf(false);
+                console.log('File deleted successfully:', data);
+            }
         } catch (e) {
             if (e.response.status >= 400) {
                 alert(e.response.data.message);
@@ -96,9 +99,9 @@ export default function Profile() {
 
             <div className="w-full md:max-w-80 rounded-2xl py-10 px-10 flex flex-col items-center" style={{ boxShadow: '0px 0px 20px rgba(0, 0, 0, 0.2)' }}>
                 {(profile != undefined && profile != '') &&
-                    <div className="w-52 rounded-full overflow-hidden">
+                    <div className="w-52 rounded-full overflow-hidden aspect-square relative">
                         <img src={profile}
-                            className="aspect-square object-cover" />
+                            className="object-cover w-full h-full absolute top-0 left-0" />
                     </div>
                 }
                 {(profile == undefined || profile == '') &&

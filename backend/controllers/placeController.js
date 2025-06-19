@@ -26,15 +26,16 @@ async function loadTrie() {
 };
 
 // to filter out photos added by link and from device
-// photos uploaded from device would be stored in firebase, this function is used to filter those photos and delete in firebase as well
-function getFirebaseLinks(photos){
+// photos uploaded from device would be stored in supabase, this function is used to filter those photos and delete in supabase as well
+function getSupabaseLinks(photos) {
     let res = [];
     photos.forEach((url) => {
         const list = url.split("/");
-        if(list[2] == "firebasestorage.googleapis.com")
+        if (list[2]?.endsWith("supabase.co")) {
             res.push(url);
+        }
     });
-    return res
+    return res;
 }
 
 // @desc Add an accommodation
@@ -88,7 +89,7 @@ const updateAccommodation = asyncHandler(async (req, res) => {
     const oldName = data.address.city;
 
     const updated = await Place.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    getFirebaseLinks(updated.photos);
+
     // trie updataion
     const newName = updated.address.city;
     if (oldName !== newName) {
@@ -112,7 +113,7 @@ const deleteAccommodation = asyncHandler(async (req, res) => {
         throw new Error("User not authorized to delete this place")
     }
 
-    const firebasePhotos = getFirebaseLinks(data.photos);
+    const supabasePhotos = getSupabaseLinks(data.photos);
 
     const deleted = await Place.findByIdAndDelete(req.params.id);
     if (!deleted) {
@@ -124,7 +125,7 @@ const deleteAccommodation = asyncHandler(async (req, res) => {
 
     res.status(200).json({
         message: "Accommodation deleted successfully",
-        photos: firebasePhotos,
+        photos: supabasePhotos,
     });
 });
 

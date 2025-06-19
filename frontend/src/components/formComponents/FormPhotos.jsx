@@ -1,8 +1,6 @@
-import { useState } from "react";
-import { storage } from "../../../firebaseConfig";
-import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage";
-import { useEffect } from "react";
+import { useState } from "react";import { useEffect } from "react";
 import UploadSkeleton from "../skeletons/UploadSkeleton";
+import { deleteImageFromSupabase, uploadImageToSupabase } from "../../../supabase/supabaseFunctions";
 
 export default function FormPhotos({ photos, setPhotos, photoLink, setPhotoLink }) {
     const [loading, setLoading] = useState(false);
@@ -27,14 +25,13 @@ export default function FormPhotos({ photos, setPhotos, photoLink, setPhotoLink 
         const selectedFiles = e.target.files;
         if (selectedFiles.length === 0) return;
         setLoading(true);
-        const uploadPromises = Array.from(selectedFiles).map(async (file) => {
-            const storageRef = ref(storage, `placePhotos/${file.name}`);
-            const snapshot = await uploadBytesResumable(storageRef, file);
-            return getDownloadURL(snapshot.ref);
+        const uploadPromises = Array.from(selectedFiles).map(async (file, index) => {
+            const url = await uploadImageToSupabase('placePhotos', file, index);
+            return url;
         });
 
         try {
-            const uploadedUrls = await Promise.all(uploadPromises);
+            const uploadedUrls = (await Promise.all(uploadPromises)).filter(Boolean);
             setUploads([...uploads, ...uploadedUrls]);
             setLoading(false);
         } catch (e) {
@@ -50,11 +47,7 @@ export default function FormPhotos({ photos, setPhotos, photoLink, setPhotoLink 
         e.preventDefault();
         if (links.includes(photoUrl)) { setLinks(prevPhotos => prevPhotos.filter(photo => photo !== photoUrl)); return }
         try {
-            const filePath = photoUrl.split("/o/")[1].split("?")[0];
-            const decodedPath = decodeURIComponent(filePath);
-
-            const storageRef = ref(storage, decodedPath);
-            await deleteObject(storageRef);
+            await deleteImageFromSupabase(photoUrl)
 
             setUploads(prevPhotos => prevPhotos.filter(photo => photo !== photoUrl))
         } catch (e) {

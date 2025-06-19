@@ -1,9 +1,8 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { storage } from "../../firebaseConfig";
-import { ref, deleteObject } from "firebase/storage";
 import FetchingSkeleton from "./skeletons/FetchingSkeleton";
+import { deleteImageFromSupabase } from "../../supabase/supabaseFunctions";
 
 export default function Accommodation() {
     const [userPlaces, setUserPlaces] = useState([]);
@@ -40,14 +39,17 @@ export default function Accommodation() {
                 setDelLoading(false);
                 setDelId("");
 
+                // Deleting from supabase
                 const photos = res.data.photos;
                 for (const url of photos) {
-                    // Extract the file path from the URL
-                    const filePath = url.split("/o/")[1].split("?")[0];
-                    const decodedPath = decodeURIComponent(filePath);
+                    console.log(photos)
+                    const { data, error } = await deleteImageFromSupabase(url);
 
-                    const storageRef = ref(storage, decodedPath);
-                    await deleteObject(storageRef);
+                    if (error) {
+                        console.error('Error deleting file:', error.message);
+                    } else {
+                        console.log('Photos deleted successfully:', data);
+                    }
                 }
 
             } catch (e) {

@@ -9,8 +9,7 @@ import PhotosGrid from "./galleryComponents/PhotosGrid";
 import Gallery from "./galleryComponents/Gallery";
 import GmapEmbed from "./GmapEmbed";
 import PlacePageSkeleton from "./skeletons/PlacePageSkeleton";
-import { storage } from "../../firebaseConfig";
-import { ref, deleteObject } from "firebase/storage";
+import { deleteImageFromSupabase } from "../../supabase/supabaseFunctions";
 
 export default function PlacePage() {
     const { id } = useParams();
@@ -53,11 +52,7 @@ export default function PlacePage() {
                 const photos = res.data.photos;
                 for (const url of photos) {
                     // Extract the file path from the URL
-                    const filePath = url.split("/o/")[1].split("?")[0];
-                    const decodedPath = decodeURIComponent(filePath);
-
-                    const storageRef = ref(storage, decodedPath);
-                    await deleteObject(storageRef);
+                    await deleteImageFromSupabase(url);
                 }
 
                 alert("Accommodation deleted");
@@ -160,9 +155,9 @@ export default function PlacePage() {
                     <div className="flex items-center gap-4">
                         <div>
                             {(owner.profilePic != undefined && owner.profilePic != '') &&
-                                <div className="w-12 rounded-full overflow-hidden">
+                                <div className="w-12 aspect-square relative rounded-full overflow-hidden">
                                     <img src={owner.profilePic}
-                                        className="aspect-square object-cover" />
+                                        className="absolute top-0 left-0 w-full h-full object-cover" />
                                 </div>
                             }
                             {(owner.profilePic == undefined || owner.profilePic == '') &&

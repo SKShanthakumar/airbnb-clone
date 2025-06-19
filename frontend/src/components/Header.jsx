@@ -62,9 +62,9 @@ function Header() {
                                 </svg>
                             </div>
                             {(profile != undefined && profile != '') &&
-                                <div className="w-9 rounded-full overflow-hidden">
+                                <div className="aspect-square relative w-9 rounded-full overflow-hidden">
                                     <img src={profile}
-                                        className="aspect-square object-cover" />
+                                        className="absolute top-0 left-0 w-full h-full object-cover" />
                                 </div>
                             }
                             {(profile == undefined || profile == '') &&
